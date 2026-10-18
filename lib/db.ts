@@ -74,19 +74,19 @@ function getInitialMockStore(): MockStore {
       {
         memb___id: 'admin',
         memb__passwd: '',
-        mail_addr: 'admin@example.invalid',
+        mail_addr: 'player@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'conqueror',
         memb__passwd: '',
-        mail_addr: 'player1@example.invalid',
+        mail_addr: 'player@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'valkyrie',
         memb__passwd: '',
-        mail_addr: 'player2@example.invalid',
+        mail_addr: 'player@example.invalid',
         bloc_code: '0',
       },
     ],
@@ -815,11 +815,13 @@ export const MuDatabase = {
   /**
    * Query Global Rankings (Top Resets, Top Level, Top Master, Top Guilds, Castle Siege)
    */
-  async getRankings(category: 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege'): Promise<any[]> {
+  async getRankings(category: 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege', classCode?: number): Promise<any[]> {
     const pool = await getDbPool();
     if (pool) {
       try {
         const req = pool.request();
+        if (classCode !== undefined) req.input('classCode', classCode);
+        const classFilter = classCode !== undefined ? ' AND c.Class = @classCode' : '';
         if (category === 'resets' || category.startsWith('resets_')) {
           if (category !== 'resets') {
             await req.query(`
@@ -843,7 +845,7 @@ export const MuDatabase = {
               FROM dbo.MU_ResetHistory h
               LEFT JOIN Character c ON c.Name = h.CharacterName
               LEFT JOIN GuildMember g ON c.Name = g.Name
-              WHERE h.CreatedAt >= DATEADD(${period}, DATEDIFF(${period}, 0, GETUTCDATE()), 0)
+              WHERE h.CreatedAt >= DATEADD(${period}, DATEDIFF(${period}, 0, GETUTCDATE()), 0)${classFilter}
               GROUP BY h.CharacterName, c.cLevel, c.Class, g.G_Name, c.MasterResetCount
               ORDER BY SUM(h.ResetCount) DESC, MAX(h.CreatedAt) ASC
             `);
@@ -858,6 +860,7 @@ export const MuDatabase = {
               ISNULL(g.G_Name, '-') AS GuildName
             FROM Character c
             LEFT JOIN GuildMember g ON c.Name = g.Name
+            WHERE 1 = 1${classFilter}
             ORDER BY c.MasterResetCount DESC, c.ResetCount DESC, c.cLevel DESC
           `);
           return result.recordset;
@@ -870,6 +873,7 @@ export const MuDatabase = {
               ISNULL(g.G_Name, '-') AS GuildName
             FROM Character c
             LEFT JOIN GuildMember g ON c.Name = g.Name
+            WHERE 1 = 1${classFilter}
             ORDER BY c.cLevel DESC, c.ResetCount DESC
           `);
           return result.recordset;
@@ -943,3 +947,4 @@ export const MuDatabase = {
 };
 
 export default MuDatabase;
+
