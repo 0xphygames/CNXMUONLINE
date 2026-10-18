@@ -815,13 +815,13 @@ export const MuDatabase = {
   /**
    * Query Global Rankings (Top Resets, Top Level, Top Master, Top Guilds, Castle Siege)
    */
-  async getRankings(category: 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege', classCode?: number): Promise<any[]> {
+  async getRankings(category: 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege', classCodes?: number[]): Promise<any[]> {
     const pool = await getDbPool();
     if (pool) {
       try {
         const req = pool.request();
-        if (classCode !== undefined) req.input('classCode', classCode);
-        const classFilter = classCode !== undefined ? ' AND c.Class = @classCode' : '';
+        (classCodes || []).forEach((code, index) => req.input(`classCode${index}`, code));
+        const classFilter = classCodes?.length ? ` AND c.Class IN (${classCodes.map((_, index) => `@classCode${index}`).join(', ')})` : '';
         if (category === 'resets' || category.startsWith('resets_')) {
           if (category !== 'resets') {
             await req.query(`
