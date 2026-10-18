@@ -37,6 +37,10 @@ export const MU_CLASSES: Record<number, CharacterClassInfo> = {
   80: { code: 80, name: 'Summoner', baseClass: 'SU', role: 'Invocadora Espiritual', tier: 1, color: '#f472b6' },
   81: { code: 81, name: 'Bloody Summoner', baseClass: 'BS', role: 'Invocadora Carmesim', tier: 2, color: '#ec4899' },
   82: { code: 82, name: 'Dimension Master', baseClass: 'DM', role: 'Mestra Dimensional (3rd Class)', tier: 3, color: '#db2777' },
+
+  // Rage Fighter line (Season 6)
+  96: { code: 96, name: 'Rage Fighter', baseClass: 'RF', role: 'Lutador de Combate', tier: 1, color: '#fb923c' },
+  98: { code: 98, name: 'Fist Master', baseClass: 'FM', role: 'Mestre dos Punhos (3rd Class)', tier: 3, color: '#ea580c' },
 };
 
 export const MU_MAPS: Record<number, string> = {
@@ -145,3 +149,4 @@ export const WCOIN_PACKAGES: WCoinPackage[] = [
     tag: 'VIP Supremo',
   },
 ];
+
