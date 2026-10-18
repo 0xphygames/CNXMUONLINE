@@ -15,7 +15,7 @@ export default function DownloadsPage() {
       updatedAt: '18 de Outubro, 2026',
       description: 'Abra o launcher numa pasta vazia. Ele baixa o cliente completo do servidor (música, sons 3D e todos os arquivos do jogo) e mantém tudo atualizado a cada abertura.',
       mirrors: [
-        { name: 'VPS oficial', url: 'http://82.38.28.139/download/Launcher.exe', highlight: true },
+        { name: 'Site oficial', url: 'https://navajowhite-badger-724362.hostingersite.com/download/Launcher.exe', highlight: true },
       ],
     },
   ];
