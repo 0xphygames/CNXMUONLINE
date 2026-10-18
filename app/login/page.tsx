@@ -234,12 +234,6 @@ function LoginForm() {
           </button>
         </form>
 
-        {/* Demo Credentials Tip */}
-        <div className="pt-3 border-t border-[#1c212c] text-[11px] text-slate-400 space-y-1">
-          <p className="font-semibold text-slate-300">Contas de teste pré-configuradas:</p>
-          <p>Login: <code className="text-amber-300">conqueror</code> · Senha: <code className="text-amber-300">mu123456</code></p>
-          <p>Login: <code className="text-amber-300">valkyrie</code> · Senha: <code className="text-amber-300">mu123456</code></p>
-        </div>
       </div>
     </div>
   );
