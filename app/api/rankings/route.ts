@@ -5,8 +5,10 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const type = (searchParams.get('type') || 'resets') as 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege';
+    const classCodeParam = searchParams.get('class');
+    const classCode = classCodeParam && /^\d+$/.test(classCodeParam) ? Number(classCodeParam) : undefined;
 
-    const rankings = await MuDatabase.getRankings(type);
+    const rankings = await MuDatabase.getRankings(type, classCode);
 
     return NextResponse.json({
       success: true,
@@ -21,3 +23,4 @@ export async function GET(req: NextRequest) {
     );
   }
 }
+
