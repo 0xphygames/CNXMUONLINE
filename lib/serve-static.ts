@@ -22,7 +22,8 @@ export async function serveFile(root: string, segments: string[]): Promise<Respo
   let stat;
   try {
     stat = await fs.stat(target);
-  } catch {
+  } catch (err) {
+    console.warn('[static] arquivo nao encontrado:', target, (err as Error).message);
     return new Response('Not found', { status: 404 });
   }
   if (!stat.isFile()) {
