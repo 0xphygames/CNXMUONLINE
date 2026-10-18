@@ -73,20 +73,20 @@ function getInitialMockStore(): MockStore {
     accounts: [
       {
         memb___id: 'admin',
-        memb__passwd: '',
-        mail_addr: 'player@example.invalid',
+        memb__passwd: 'admin123',
+        mail_addr: 'admin@muonline-s6.com',
         bloc_code: '0',
       },
       {
         memb___id: 'conqueror',
-        memb__passwd: '',
-        mail_addr: 'player@example.invalid',
+        memb__passwd: 'mu123456',
+        mail_addr: 'player1@gmail.com',
         bloc_code: '0',
       },
       {
         memb___id: 'valkyrie',
-        memb__passwd: '',
-        mail_addr: 'player@example.invalid',
+        memb__passwd: 'mu123456',
+        mail_addr: 'player2@gmail.com',
         bloc_code: '0',
       },
     ],
@@ -833,7 +833,10 @@ export const MuDatabase = {
                 CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
               )
             `);
-            const period = category === 'resets_daily' ? 'DAY' : category === 'resets_weekly' ? 'WEEK' : 'MONTH';
+            const period = category === 'resets_daily' ? 'DAY' : category === 'resets_monthly' ? 'MONTH' : null;
+            const periodFilter = period
+              ? `h.CreatedAt >= DATEADD(${period}, DATEDIFF(${period}, 0, SYSUTCDATETIME()), 0)`
+              : `h.CreatedAt >= DATEADD(DAY, -7, SYSUTCDATETIME())`;
             const result = await req.query(`
               SELECT TOP 50
                 h.CharacterName AS Name,
@@ -845,7 +848,7 @@ export const MuDatabase = {
               FROM dbo.MU_ResetHistory h
               LEFT JOIN Character c ON c.Name = h.CharacterName
               LEFT JOIN GuildMember g ON c.Name = g.Name
-              WHERE h.CreatedAt >= DATEADD(${period}, DATEDIFF(${period}, 0, GETUTCDATE()), 0)${classFilter}
+              WHERE ${periodFilter}${classFilter}
               GROUP BY h.CharacterName, c.cLevel, c.Class, g.G_Name, c.MasterResetCount
               ORDER BY SUM(h.ResetCount) DESC, MAX(h.CreatedAt) ASC
             `);
@@ -877,6 +880,19 @@ export const MuDatabase = {
             ORDER BY c.cLevel DESC, c.ResetCount DESC
           `);
           return result.recordset;
+        } else if (category === 'master') {
+          const result = await req.query(`
+            SELECT TOP 50
+              c.Name, ISNULL(c.MasterLevel, 0) AS MasterLevel,
+              ISNULL(c.cLevel, 0) AS cLevel, ISNULL(c.ResetCount, 0) AS ResetCount,
+              ISNULL(c.MasterResetCount, 0) AS m_GrandReset, c.Class,
+              ISNULL(g.G_Name, '-') AS GuildName
+            FROM Character c
+            LEFT JOIN GuildMember g ON c.Name = g.Name
+            WHERE 1 = 1${classFilter}
+            ORDER BY c.MasterLevel DESC, c.cLevel DESC, c.ResetCount DESC
+          `);
+          return result.recordset;
         } else if (category === 'guilds') {
           const result = await req.query(`
             SELECT TOP 20 
@@ -888,6 +904,18 @@ export const MuDatabase = {
             ORDER BY G_Score DESC
           `);
           return result.recordset;
+        } else if (category === 'siege') {
+          const result = await req.query(`
+            SELECT TOP 1
+              ISNULL(d.OWNER_GUILD, '-') AS OwnerGuild,
+              ISNULL(g.G_Master, '-') AS Master,
+              ISNULL(d.SIEGE_END_DATE, NULL) AS SiegeEndDate,
+              ISNULL(d.SIEGE_START_DATE, NULL) AS SiegeStartDate
+            FROM MuCastle_DATA d
+            LEFT JOIN Guild g ON g.G_Name = d.OWNER_GUILD
+            WHERE d.MAP_SVR_GROUP = 0
+          `);
+          return result.recordset;
         }
       } catch (err) {
         console.error('[MSSQL Rankings Query Error]:', err);
@@ -895,10 +923,7 @@ export const MuDatabase = {
       }
     }
 
-    if (category === 'master' || category === 'siege') {
-      // Sem fonte de dados no banco ainda
-      return [];
-    }
+    if (category === 'master' || category === 'siege') return [];
 
     throw new Error('Banco de dados indisponível: ranking não carregado');
   },
