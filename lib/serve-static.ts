@@ -39,9 +39,10 @@ export async function serveFile(root: string, segments: string[]): Promise<Respo
   });
 }
 
-// Pasta de arquivos publicos, definida na variavel PUBLIC_FILES_DIR (ex.: .../public_html).
-export function publicFilesDir(sub: 'patch' | 'download'): string | null {
-  const dir = process.env.PUBLIC_FILES_DIR;
-  if (!dir) return null;
-  return path.join(dir, sub);
+// Pasta de arquivos publicos (public_html da conta na Hostinger).
+// PUBLIC_FILES_DIR sobrescreve o padrao, se estiver definida.
+const DEFAULT_PUBLIC_DIR = '/home/u251218147/domains/navajowhite-badger-724362.hostingersite.com/public_html';
+
+export function publicFilesDir(sub: 'patch' | 'download'): string {
+  return path.join(process.env.PUBLIC_FILES_DIR || DEFAULT_PUBLIC_DIR, sub);
 }

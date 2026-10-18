@@ -7,9 +7,6 @@ export async function GET(
   { params }: { params: Promise<{ path: string[] }> },
 ) {
   const root = publicFilesDir('patch');
-  if (!root) {
-    return new Response('PUBLIC_FILES_DIR nao configurada.', { status: 500 });
-  }
   const { path: segments } = await params;
   return serveFile(root, segments);
 }
