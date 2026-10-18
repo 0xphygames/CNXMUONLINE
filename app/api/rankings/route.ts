@@ -5,10 +5,14 @@ export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
     const type = (searchParams.get('type') || 'resets') as 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege';
-    const classCodeParam = searchParams.get('class');
-    const classCode = classCodeParam && /^\d+$/.test(classCodeParam) ? Number(classCodeParam) : undefined;
+    const classCodes = (searchParams.get('classes') || '')
+      .split(',')
+      .filter((value) => /^\d+$/.test(value))
+      .map(Number)
+      .filter((value, index, values) => values.indexOf(value) === index)
+      .slice(0, 3);
 
-    const rankings = await MuDatabase.getRankings(type, classCode);
+    const rankings = await MuDatabase.getRankings(type, classCodes.length ? classCodes : undefined);
 
     return NextResponse.json({
       success: true,
