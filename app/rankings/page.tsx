@@ -21,7 +21,7 @@ function RankingsContent() {
     let active = true;
     const load = async () => {
       try {
-        const classParam = classFilter === 'all' ? '' : `&class=${classFilter}`;
+        const classParam = classFilter === 'all' ? '' : `&classes=${classFilter}`;
         const res = await fetch(`/api/rankings?type=${activeTab}${classParam}`);
         const json = await res.json();
         if (active) {
@@ -64,7 +64,14 @@ function RankingsContent() {
     return (item.Name || '').toLowerCase().includes(q) || (item.GuildName || '').toLowerCase().includes(q);
   });
 
-  const classOptions = Object.values(MU_CLASSES);
+  const classGroups = [
+    { value: '0,1,2', label: 'Dark Wizard → Grand Master' },
+    { value: '16,17,18', label: 'Dark Knight → Blade Master' },
+    { value: '32,33,34', label: 'Fairy Elf → High Elf' },
+    { value: '48,50', label: 'Magic Gladiator → Duel Master' },
+    { value: '64,66', label: 'Dark Lord → Lord Emperor' },
+    { value: '80,81,82', label: 'Summoner → Dimension Master' },
+  ];
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
@@ -131,8 +138,8 @@ function RankingsContent() {
             className="bg-[#12151c] border border-[#222733] rounded-lg px-3 py-2 text-xs text-slate-100 focus:outline-none focus:border-amber-400/60"
           >
             <option value="all">Todas as classes</option>
-            {classOptions.map((classInfo) => (
-              <option key={classInfo.code} value={classInfo.code}>{classInfo.name}</option>
+            {classGroups.map((group) => (
+              <option key={group.value} value={group.value}>{group.label}</option>
             ))}
           </select>
         </div>
