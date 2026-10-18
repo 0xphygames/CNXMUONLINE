@@ -65,12 +65,13 @@ function RankingsContent() {
   });
 
   const classGroups = [
-    { value: '0,1,2', label: 'Dark Wizard → Grand Master' },
-    { value: '16,17,18', label: 'Dark Knight → Blade Master' },
-    { value: '32,33,34', label: 'Fairy Elf → High Elf' },
-    { value: '48,50', label: 'Magic Gladiator → Duel Master' },
-    { value: '64,66', label: 'Dark Lord → Lord Emperor' },
-    { value: '80,81,82', label: 'Summoner → Dimension Master' },
+    { value: '0,1,2', label: 'Dark Wizard (DW / SM / GM)' },
+    { value: '16,17,18', label: 'Dark Knight (DK / BK / BM)' },
+    { value: '32,33,34', label: 'Fairy Elf (FE / ME / HE)' },
+    { value: '48,50', label: 'Magic Gladiator (MG / DM)' },
+    { value: '64,66', label: 'Dark Lord (DL / LE)' },
+    { value: '80,81,82', label: 'Summoner (SU / BS / DM)' },
+    { value: '96,98', label: 'Rage Fighter (RF / FM)' },
   ];
 
   return (
