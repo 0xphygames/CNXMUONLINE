@@ -5,7 +5,7 @@ import { useSearchParams } from 'next/navigation';
 import { Trophy, Search, Shield, Crown, Swords, Users, Sparkles, RefreshCw } from 'lucide-react';
 import { MU_CLASSES, getClassName } from '@/lib/mu-constants';
 
-type TabType = 'resets' | 'level' | 'master' | 'guilds' | 'siege';
+type TabType = 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege';
 
 function RankingsContent() {
   const searchParams = useSearchParams();
@@ -44,6 +44,9 @@ function RankingsContent() {
 
   const tabs: Array<{ id: TabType; label: string; icon: React.ReactNode }> = [
     { id: 'resets', label: 'Top Resets', icon: <Trophy className="w-3.5 h-3.5" /> },
+    { id: 'resets_daily', label: 'Diário', icon: <Trophy className="w-3.5 h-3.5" /> },
+    { id: 'resets_weekly', label: 'Semanal', icon: <Trophy className="w-3.5 h-3.5" /> },
+    { id: 'resets_monthly', label: 'Mensal', icon: <Trophy className="w-3.5 h-3.5" /> },
     { id: 'level', label: 'Top Level', icon: <Sparkles className="w-3.5 h-3.5" /> },
     { id: 'master', label: 'Top Master Level', icon: <Swords className="w-3.5 h-3.5" /> },
     { id: 'guilds', label: 'Top Guilds', icon: <Users className="w-3.5 h-3.5" /> },
