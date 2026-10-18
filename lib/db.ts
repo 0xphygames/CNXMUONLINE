@@ -48,6 +48,7 @@ interface MockStore {
     Dexterity: number;
     Vitality: number;
     Energy: number;
+    LevelUpPoint?: number;
     Leadership: number;
     PkCount: number;
     PkLevel: number;
@@ -326,6 +327,7 @@ export interface CharacterRow {
   Dexterity: number;
   Vitality: number;
   Energy: number;
+  LevelUpPoint?: number;
   Leadership: number;
   PkCount: number;
   PkLevel: number;
@@ -720,7 +722,8 @@ export const MuDatabase = {
             c.AccountID, c.Name, c.cLevel, 
             ISNULL(c.ResetCount, 0) AS ResetCount, 
             ISNULL(c.MasterResetCount, 0) AS m_GrandReset,
-            c.Class, c.Money, c.Strength, c.Dexterity, c.Vitality, c.Energy, 
+            c.Class, c.Money, c.Strength, c.Dexterity, c.Vitality, c.Energy,
+            ISNULL(c.LevelUpPoint, 0) AS LevelUpPoint,
             ISNULL(c.Leadership, 0) AS Leadership,
             ISNULL(c.PkCount, 0) AS PkCount,
             ISNULL(c.PkLevel, 3) AS PkLevel,
@@ -773,7 +776,12 @@ export const MuDatabase = {
         } else if (action === 'reset_stats') {
           await req.query(`
             UPDATE Character
-            SET Strength = 30, Dexterity = 30, Vitality = 30, Energy = 30
+            SET LevelUpPoint = ISNULL(LevelUpPoint, 0)
+              + CASE WHEN Strength > 30 THEN Strength - 30 ELSE 0 END
+              + CASE WHEN Dexterity > 30 THEN Dexterity - 30 ELSE 0 END
+              + CASE WHEN Vitality > 30 THEN Vitality - 30 ELSE 0 END
+              + CASE WHEN Energy > 30 THEN Energy - 30 ELSE 0 END,
+                Strength = 30, Dexterity = 30, Vitality = 30, Energy = 30
             WHERE AccountID = @AccountID AND Name = @Name
           `);
           return { success: true, message: `Atributos de ${characterName} foram resetados com sucesso para redistribuição!` };
@@ -802,6 +810,11 @@ export const MuDatabase = {
       char.MapPosY = 125;
       return { success: true, message: `Personagem ${characterName} foi movido com sucesso para Lorencia!` };
     } else if (action === 'reset_stats') {
+      char.LevelUpPoint = (char.LevelUpPoint || 0)
+        + Math.max(0, char.Strength - 30)
+        + Math.max(0, char.Dexterity - 30)
+        + Math.max(0, char.Vitality - 30)
+        + Math.max(0, char.Energy - 30);
       char.Strength = 30;
       char.Dexterity = 30;
       char.Vitality = 30;
