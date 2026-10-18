@@ -160,19 +160,19 @@ function RankingsContent() {
               <div className="flex items-center gap-2 text-xs font-bold text-amber-400 uppercase tracking-wider">
                 <Crown className="w-4 h-4" /> Detentores da Coroa do Castelo (Soberanos Atuais)
               </div>
-              <h2 className="text-3xl font-extrabold text-white">Guild Valhalla</h2>
+              <h2 className="text-3xl font-extrabold text-white">{data[0]?.OwnerGuild || 'Nenhuma guild proprietária'}</h2>
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2 text-xs">
                 <div className="bg-[#0b0d11] p-3 rounded border border-[#1a1f29]">
                   <span className="text-slate-400 block text-[10px]">Guild Master:</span>
-                  <strong className="text-white text-sm">LordKael</strong>
+                  <strong className="text-white text-sm">{data[0]?.Master || '-'}</strong>
                 </div>
                 <div className="bg-[#0b0d11] p-3 rounded border border-[#1a1f29]">
                   <span className="text-slate-400 block text-[10px]">Aliança Registrada:</span>
-                  <strong className="text-amber-400 text-sm">Nordic Alliance</strong>
+                  <strong className="text-amber-400 text-sm">-</strong>
                 </div>
                 <div className="bg-[#0b0d11] p-3 rounded border border-[#1a1f29]">
                   <span className="text-slate-400 block text-[10px]">Defesas Consecutivas:</span>
-                  <strong className="text-emerald-400 text-sm">5 Semanas</strong>
+                  <strong className="text-emerald-400 text-sm">Dados do servidor</strong>
                 </div>
               </div>
             </div>
