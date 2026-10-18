@@ -10,25 +10,12 @@ export default function DownloadsPage() {
       id: 'launcher',
       title: 'Launcher Oficial com Auto-Update',
       tag: 'Baixe, abra e o cliente completo é instalado automaticamente',
-      size: '155 MB',
+      size: '162 MB',
       version: 'v1.0.0',
       updatedAt: '18 de Outubro, 2026',
       description: 'Abra o launcher numa pasta vazia. Ele baixa o cliente completo do servidor (música, sons 3D e todos os arquivos do jogo) e mantém tudo atualizado a cada abertura.',
       mirrors: [
         { name: 'Site oficial', url: '/download/Launcher.exe', highlight: true },
-      ],
-    },
-    {
-      id: 'drivers',
-      title: 'Pacote de Drivers & Pré-Requisitos',
-      tag: 'Essencial para evitar tela preta ou crash',
-      size: '78 MB',
-      version: 'DirectX 9.0c + VC++ Redist',
-      updatedAt: 'Janeiro, 2026',
-      description: 'Contém Microsoft Visual C++ 2015-2022 (x86/x64), bibliotecas do DirectX 9.0c End-User Runtimes e .NET Framework necessários para executar o jogo suavemente.',
-      mirrors: [
-        { name: 'Microsoft Direct', url: 'https://microsoft.com', highlight: true },
-        { name: 'Google Drive', url: 'https://drive.google.com' },
       ],
     },
   ];
