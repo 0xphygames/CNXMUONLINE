@@ -719,7 +719,7 @@ export const MuDatabase = {
           SELECT 
             c.AccountID, c.Name, c.cLevel, 
             ISNULL(c.ResetCount, 0) AS ResetCount, 
-            ISNULL(c.m_GrandReset, 0) AS m_GrandReset,
+            ISNULL(c.MasterResetCount, 0) AS m_GrandReset,
             c.Class, c.Money, c.Strength, c.Dexterity, c.Vitality, c.Energy, 
             ISNULL(c.Leadership, 0) AS Leadership,
             ISNULL(c.PkCount, 0) AS PkCount,
@@ -727,7 +727,7 @@ export const MuDatabase = {
             c.MapNumber, c.MapPosX, c.MapPosY,
             ISNULL(g.G_Name, '') AS GuildName
           FROM Character c
-          LEFT JOIN GuildMember g ON c.Name = g.G_Name
+          LEFT JOIN GuildMember g ON c.Name = g.Name
           WHERE c.AccountID = @AccountID
           ORDER BY c.ResetCount DESC, c.cLevel DESC
         `);
@@ -825,12 +825,12 @@ export const MuDatabase = {
             SELECT TOP 50 
               c.Name, c.cLevel, 
               ISNULL(c.ResetCount, 0) AS ResetCount, 
-              ISNULL(c.m_GrandReset, 0) AS m_GrandReset, 
+              ISNULL(c.MasterResetCount, 0) AS m_GrandReset, 
               c.Class, 
               ISNULL(g.G_Name, '-') AS GuildName
             FROM Character c
-            LEFT JOIN GuildMember g ON c.Name = g.G_Name
-            ORDER BY c.m_GrandReset DESC, c.ResetCount DESC, c.cLevel DESC
+            LEFT JOIN GuildMember g ON c.Name = g.Name
+            ORDER BY c.MasterResetCount DESC, c.ResetCount DESC, c.cLevel DESC
           `);
           return result.recordset;
         } else if (category === 'level') {
@@ -841,7 +841,7 @@ export const MuDatabase = {
               c.Class, 
               ISNULL(g.G_Name, '-') AS GuildName
             FROM Character c
-            LEFT JOIN GuildMember g ON c.Name = g.G_Name
+            LEFT JOIN GuildMember g ON c.Name = g.Name
             ORDER BY c.cLevel DESC, c.ResetCount DESC
           `);
           return result.recordset;
@@ -858,51 +858,17 @@ export const MuDatabase = {
           return result.recordset;
         }
       } catch (err) {
-        console.warn('[MSSQL Rankings Query Error, using engine cache]:', err);
+        console.error('[MSSQL Rankings Query Error]:', err);
+        throw err;
       }
     }
 
-    // Fallback Mock Engine Rankings
-    const store = global.__mockDbStore!;
-    if (category === 'resets') {
-      return [...store.characters]
-        .sort((a, b) => b.m_GrandReset - a.m_GrandReset || b.ResetCount - a.ResetCount || b.cLevel - a.cLevel)
-        .slice(0, 50);
-    } else if (category === 'level') {
-      return [...store.characters]
-        .sort((a, b) => b.cLevel - a.cLevel || b.ResetCount - a.ResetCount)
-        .slice(0, 50);
-    } else if (category === 'master') {
-      // 3rd Class characters sorted by Master Level
-      return [...store.characters]
-        .filter((c) => [2, 18, 34, 50, 66, 82].includes(c.Class))
-        .map((c) => ({ ...c, MasterLevel: Math.floor(c.ResetCount * 3.8) }))
-        .sort((a, b) => b.MasterLevel - a.MasterLevel);
-    } else if (category === 'guilds') {
-      return [
-        { Name: 'Valhalla', Master: 'LordKael', Score: 14500, Members: 38, Alliance: 'Nordic Alliance' },
-        { Name: 'Imperium', Master: 'HighQueenSylv', Score: 12800, Members: 35, Alliance: 'Iron Throne' },
-        { Name: 'DragonLords', Master: 'DimensionWitch', Score: 9400, Members: 29, Alliance: '-' },
-        { Name: 'ShadowOrder', Master: 'DarthVader', Score: 7800, Members: 24, Alliance: '-' },
-        { Name: 'Aethelgard', Master: 'Ragnarok', Score: 6200, Members: 20, Alliance: '-' },
-      ];
-    } else if (category === 'siege') {
-      return [
-        {
-          CastleOwner: 'Valhalla',
-          GuildMaster: 'LordKael',
-          Alliance: 'Nordic Alliance',
-          DefensesOccupied: '5 semanas consecutivas',
-          NextBattleDate: 'Próximo Domingo às 20:00 (Horário de Brasília)',
-          RegisteredGuilds: [
-            { Guild: 'Imperium', Master: 'HighQueenSylv', AttackStatus: 'Desafiante Principal' },
-            { Guild: 'DragonLords', Master: 'DimensionWitch', AttackStatus: 'Desafiante 2' },
-          ],
-        },
-      ];
+    if (category === 'master' || category === 'siege') {
+      // Sem fonte de dados no banco ainda
+      return [];
     }
 
-    return [];
+    throw new Error('Banco de dados indisponível: ranking não carregado');
   },
 
   /**
