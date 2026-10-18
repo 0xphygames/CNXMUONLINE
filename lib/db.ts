@@ -73,20 +73,20 @@ function getInitialMockStore(): MockStore {
     accounts: [
       {
         memb___id: 'admin',
-        memb__passwd: 'admin123',
-        mail_addr: 'admin@muonline-s6.com',
+        memb__passwd: '',
+        mail_addr: 'admin@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'conqueror',
-        memb__passwd: 'mu123456',
-        mail_addr: 'player1@gmail.com',
+        memb__passwd: '',
+        mail_addr: 'player1@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'valkyrie',
-        memb__passwd: 'mu123456',
-        mail_addr: 'player2@gmail.com',
+        memb__passwd: '',
+        mail_addr: 'player2@example.invalid',
         bloc_code: '0',
       },
     ],
@@ -815,12 +815,40 @@ export const MuDatabase = {
   /**
    * Query Global Rankings (Top Resets, Top Level, Top Master, Top Guilds, Castle Siege)
    */
-  async getRankings(category: 'resets' | 'level' | 'master' | 'guilds' | 'siege'): Promise<any[]> {
+  async getRankings(category: 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege'): Promise<any[]> {
     const pool = await getDbPool();
     if (pool) {
       try {
         const req = pool.request();
-        if (category === 'resets') {
+        if (category === 'resets' || category.startsWith('resets_')) {
+          if (category !== 'resets') {
+            await req.query(`
+              IF OBJECT_ID('dbo.MU_ResetHistory', 'U') IS NULL
+              CREATE TABLE dbo.MU_ResetHistory (
+                Id INT IDENTITY(1,1) PRIMARY KEY,
+                CharacterName VARCHAR(10) NOT NULL,
+                ResetCount INT NOT NULL DEFAULT 1,
+                CreatedAt DATETIME2 NOT NULL DEFAULT SYSUTCDATETIME()
+              )
+            `);
+            const period = category === 'resets_daily' ? 'DAY' : category === 'resets_weekly' ? 'WEEK' : 'MONTH';
+            const result = await req.query(`
+              SELECT TOP 50
+                h.CharacterName AS Name,
+                SUM(h.ResetCount) AS ResetCount,
+                ISNULL(c.cLevel, 0) AS cLevel,
+                ISNULL(c.Class, 0) AS Class,
+                ISNULL(g.G_Name, '-') AS GuildName,
+                ISNULL(c.MasterResetCount, 0) AS m_GrandReset
+              FROM dbo.MU_ResetHistory h
+              LEFT JOIN Character c ON c.Name = h.CharacterName
+              LEFT JOIN GuildMember g ON c.Name = g.Name
+              WHERE h.CreatedAt >= DATEADD(${period}, DATEDIFF(${period}, 0, GETUTCDATE()), 0)
+              GROUP BY h.CharacterName, c.cLevel, c.Class, g.G_Name, c.MasterResetCount
+              ORDER BY SUM(h.ResetCount) DESC, MAX(h.CreatedAt) ASC
+            `);
+            return result.recordset;
+          }
           const result = await req.query(`
             SELECT TOP 50 
               c.Name, c.cLevel, 
