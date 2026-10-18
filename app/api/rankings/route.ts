@@ -4,7 +4,7 @@ import { MuDatabase } from '@/lib/db';
 export async function GET(req: NextRequest) {
   try {
     const searchParams = req.nextUrl.searchParams;
-    const type = (searchParams.get('type') || 'resets') as 'resets' | 'level' | 'master' | 'guilds' | 'siege';
+    const type = (searchParams.get('type') || 'resets') as 'resets' | 'resets_daily' | 'resets_weekly' | 'resets_monthly' | 'level' | 'master' | 'guilds' | 'siege';
 
     const rankings = await MuDatabase.getRankings(type);
 
