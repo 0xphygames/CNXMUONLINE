@@ -7,30 +7,15 @@ import { Download, HardDrive, Monitor, ShieldCheck, ExternalLink, Cpu, CheckCirc
 export default function DownloadsPage() {
   const downloadPackages = [
     {
-      id: 'full_client',
-      title: 'Cliente Completo com Som & Música',
-      tag: 'Recomendado para novos jogadores',
-      size: '1.42 GB',
-      version: 'v6.3.2 Final',
-      updatedAt: '05 de Outubro, 2026',
-      description: 'Instalador completo do Mu Online Season 6 contendo todos os arquivos de áudio originais (músicas de Lorencia, Noria, Devias), efeitos sonoros 3D e Launcher integrado.',
+      id: 'launcher',
+      title: 'Launcher Oficial com Auto-Update',
+      tag: 'Baixe, abra e o cliente completo é instalado automaticamente',
+      size: '155 MB',
+      version: 'v1.0.0',
+      updatedAt: '18 de Outubro, 2026',
+      description: 'Abra o launcher numa pasta vazia. Ele baixa o cliente completo do servidor (música, sons 3D e todos os arquivos do jogo) e mantém tudo atualizado a cada abertura.',
       mirrors: [
-        { name: 'Google Drive', url: 'https://drive.google.com', highlight: true },
-        { name: 'Mega.nz', url: 'https://mega.nz' },
-        { name: 'MediaFire', url: 'https://mediafire.com' },
-      ],
-    },
-    {
-      id: 'lite_launcher',
-      title: 'Launcher Oficial Auto-Update',
-      tag: 'Apenas para quem já possui cliente S6',
-      size: '42 MB',
-      version: 'v2.1 Auto',
-      updatedAt: '08 de Outubro, 2026',
-      description: 'Executável leve de atualização automática. Baixa apenas as correções de interface, modelos de novos itens e proteção anti-cheat LiveGuard.',
-      mirrors: [
-        { name: 'Google Drive', url: 'https://drive.google.com', highlight: true },
-        { name: 'MediaFire', url: 'https://mediafire.com' },
+        { name: 'Site oficial', url: '/download/Launcher.exe', highlight: true },
       ],
     },
     {
@@ -174,28 +159,28 @@ export default function DownloadsPage() {
         <div className="bg-[#12151c] border border-[#222733] rounded-xl p-6 space-y-4">
           <div className="flex items-center gap-2 border-b border-[#222733] pb-3">
             <ShieldCheck className="w-5 h-5 text-emerald-400" />
-            <h3 className="text-base font-bold text-white">Instalação & Dica de Antivírus</h3>
+            <h3 className="text-base font-bold text-white">Como instalar</h3>
           </div>
 
           <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
             <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <p>
-                <strong>1. Extraia o jogo:</strong> Utilize o WinRAR ou 7-Zip para descompactar o arquivo <code className="text-amber-300">MuOnline_Season6_Full.rar</code> em uma pasta de sua preferência (ex: <code className="text-slate-400">C:\Jogos\MuOnline</code>).
+                <strong>1. Crie uma pasta vazia:</strong> por exemplo <code className="text-slate-400">C:\Jogos\MuOnline</code>.
               </p>
             </div>
 
             <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <p>
-                <strong>2. Adicione às Exceções do Windows Defender:</strong> Por conter proteção anti-cheat em nível de kernel (LiveGuard), o Windows pode emitir alerta de falso positivo. Adicione a pasta do jogo na lista de exclusões do seu antivírus.
+                <strong>2. Baixe e abra o Launcher:</strong> coloque o <code className="text-amber-300">Launcher.exe</code> nessa pasta e clique duas vezes para abrir.
               </p>
             </div>
 
             <div className="flex items-start gap-2.5">
               <CheckCircle2 className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
               <p>
-                <strong>3. Execute como Administrador:</strong> Abra o arquivo <code className="text-amber-300">Launcher.exe</code> como Administrador para que as atualizações automáticas sejam aplicadas com sucesso.
+                <strong>3. Aguarde a instalação:</strong> o launcher baixa o cliente completo (cerca de 1,1 GB) e, ao terminar, clique em <strong>Jogar</strong>. Nas próximas vezes, ele só baixa o que mudou.
               </p>
             </div>
 
