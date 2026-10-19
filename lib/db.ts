@@ -896,14 +896,14 @@ export const MuDatabase = {
         } else if (category === 'master') {
           const result = await req.query(`
             SELECT TOP 50
-              c.Name, ISNULL(c.MasterLevel, 0) AS MasterLevel,
+              c.Name, ISNULL(c.MasterResetCount, 0) AS MasterLevel,
               ISNULL(c.cLevel, 0) AS cLevel, ISNULL(c.ResetCount, 0) AS ResetCount,
               ISNULL(c.MasterResetCount, 0) AS m_GrandReset, c.Class,
               ISNULL(g.G_Name, '-') AS GuildName
             FROM Character c
             LEFT JOIN GuildMember g ON c.Name = g.Name
             WHERE 1 = 1${classFilter}
-            ORDER BY c.MasterLevel DESC, c.cLevel DESC, c.ResetCount DESC
+            ORDER BY c.MasterResetCount DESC, c.cLevel DESC, c.ResetCount DESC
           `);
           return result.recordset;
         } else if (category === 'guilds') {
