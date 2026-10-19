@@ -599,7 +599,7 @@ export const MuDatabase = {
     req.input('AccountID', sql.VarChar(10), username);
     const result = await req.query(`
       SELECT d.DeliveryID, d.OrderID, d.BaseItemCode, d.DeliveryStatus,
-        d.DeliveredAt, p.Name, p.Slug, p.Currency, p.Price
+        d.DeliveredAt, d.ClaimedAt, p.Name, p.Slug, p.Currency, p.Price
       FROM dbo.WebShopDelivery d
       INNER JOIN dbo.WebShopOrderItem oi ON oi.OrderItemID = d.OrderItemID
       INNER JOIN dbo.WebShopProduct p ON p.ProductID = oi.ProductID
@@ -607,6 +607,15 @@ export const MuDatabase = {
       ORDER BY d.DeliveredAt DESC
     `);
     return result.recordset;
+  },
+
+  async claimWebShopDelivery(username: string, deliveryId: number) {
+    const pool = await getDbPool();
+    if (!pool) throw new Error('Banco de dados indisponível.');
+    const req = pool.request();
+    req.input('AccountID', sql.VarChar(10), username);
+    req.input('DeliveryID', sql.BigInt, deliveryId);
+    await req.execute('dbo.WebShopClaimDelivery');
   },
 
   /**

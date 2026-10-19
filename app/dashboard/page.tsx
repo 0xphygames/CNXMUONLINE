@@ -29,6 +29,8 @@ export default function DashboardPage() {
   const [selectedChar, setSelectedChar] = useState<UserCharacter | null>(null);
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
+  const [chest, setChest] = useState<any[]>([]);
+  const [transferLoading, setTransferLoading] = useState<number | null>(null);
 
   // Password change state
   const [newPassword, setNewPassword] = useState('');
@@ -39,6 +41,21 @@ export default function DashboardPage() {
       router.push('/login');
     }
   }, [user, loading, router]);
+
+  useEffect(() => {
+    if (user) fetch('/api/shop/chest').then((res) => res.json()).then((data) => { if (data.success) setChest(data.items); }).catch(() => {});
+  }, [user]);
+
+  const transferItem = async (deliveryId: number) => {
+    setTransferLoading(deliveryId);
+    try {
+      const res = await fetch('/api/shop/transfer', { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ deliveryId }) });
+      const data = await res.json();
+      if (!res.ok || !data.success) throw new Error(data.message || 'Não foi possível transferir o item.');
+      setFeedback({ type: 'success', message: data.message });
+      setChest((items) => items.map((item) => item.DeliveryID === deliveryId ? { ...item, ClaimedAt: new Date().toISOString() } : item));
+    } catch (error) { setFeedback({ type: 'error', message: (error as Error).message }); } finally { setTransferLoading(null); }
+  };
 
   const activeChar = selectedChar || (user?.characters && user.characters.length > 0 ? user.characters[0] : null);
 
@@ -217,6 +234,14 @@ export default function DashboardPage() {
           <p className="text-[10px] text-slate-400">Acumule 1 GP a cada 10 minutos online no servidor</p>
         </div>
       </div>
+
+      <section className="rounded-xl border border-amber-500/30 bg-[#12151c] p-6">
+        <div className="flex items-center justify-between border-b border-[#222733] pb-4">
+          <div><h2 className="text-xl font-bold text-white">Baú virtual</h2><p className="mt-1 text-xs text-slate-400">Itens comprados no site. Clique para confirmar o envio ao CashShop do jogo.</p></div>
+          <Link href="/shop" className="rounded-lg bg-amber-400 px-4 py-2 text-xs font-bold text-black">Comprar itens</Link>
+        </div>
+        {chest.length === 0 ? <p className="py-6 text-sm text-slate-500">Seu baú está vazio.</p> : <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{chest.map((item) => <div key={item.DeliveryID} className="rounded-lg border border-[#343a48] bg-[#0b0d11] p-4"><strong className="text-white">{item.Name}</strong><p className="mt-1 text-[11px] text-slate-400">Entrega #{item.DeliveryID}</p><button disabled={!!item.ClaimedAt || transferLoading === item.DeliveryID} onClick={() => transferItem(item.DeliveryID)} className="mt-4 w-full rounded-lg bg-emerald-500 px-3 py-2 text-xs font-bold text-black disabled:opacity-50">{item.ClaimedAt ? 'Enviado para o jogo' : transferLoading === item.DeliveryID ? 'Enviando...' : 'Enviar para o jogo'}</button></div>)}</div>}
+      </section>
 
       {/* Characters & Management Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8 items-start">
@@ -480,3 +505,4 @@ export default function DashboardPage() {
     </div>
   );
 }
+
