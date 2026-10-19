@@ -390,7 +390,7 @@ export const MuDatabase = {
   },
 
   /**
-   * Create account in MEMB_INFO and initialize T_InGameShop_Point (Prepared Statement)
+   * Create account in MEMB_INFO and initialize CashShopData (Prepared Statement)
    */
   async createAccount(username: string, passwordHashOrPlain: string, email: string): Promise<boolean> {
     const pool = await getDbPool();
@@ -408,13 +408,13 @@ export const MuDatabase = {
           VALUES (@memb___id, @memb__pwd, @mail_addr, '0', '0')
         `);
 
-        // Check if T_InGameShop_Point exists and insert default 0 points
+        // Check if CashShopData exists and insert default 0 points
         const req2 = new sql.Request(transaction);
         req2.input('memb___id', sql.VarChar(10), username);
         await req2.query(`
-          IF NOT EXISTS (SELECT 1 FROM T_InGameShop_Point WHERE memb___id = @memb___id)
+          IF NOT EXISTS (SELECT 1 FROM CashShopData WHERE AccountID = @memb___id)
           BEGIN
-            INSERT INTO T_InGameShop_Point (memb___id, WCoinC, WCoinP, GoblinPoint)
+            INSERT INTO CashShopData (AccountID, WCoinC, WCoinP, GoblinPoint)
             VALUES (@memb___id, 0, 0, 0)
           END
         `);
@@ -509,7 +509,7 @@ export const MuDatabase = {
   },
 
   /**
-   * Get WCoinC, WCoinP and GoblinPoint from T_InGameShop_Point
+   * Get WCoinC, WCoinP and GoblinPoint from CashShopData
    */
   async getShopPoints(username: string): Promise<InGameShopRow> {
     const pool = await getDbPool();
@@ -518,9 +518,9 @@ export const MuDatabase = {
         const req = pool.request();
         req.input('memb___id', sql.VarChar(10), username);
         const result = await req.query<InGameShopRow>(`
-          SELECT memb___id, ISNULL(WCoinC, 0) AS WCoinC, ISNULL(WCoinP, 0) AS WCoinP, ISNULL(GoblinPoint, 0) AS GoblinPoint
-          FROM T_InGameShop_Point
-          WHERE memb___id = @memb___id
+          SELECT AccountID AS memb___id, ISNULL(WCoinC, 0) AS WCoinC, ISNULL(WCoinP, 0) AS WCoinP, ISNULL(GoblinPoint, 0) AS GoblinPoint
+          FROM CashShopData
+          WHERE AccountID = @memb___id
         `);
         if (result.recordset[0]) {
           return result.recordset[0];
@@ -552,15 +552,15 @@ export const MuDatabase = {
       const transaction = new sql.Transaction(pool);
       await transaction.begin();
       try {
-        // Update or insert T_InGameShop_Point
+        // Update or insert CashShopData
         const req1 = new sql.Request(transaction);
         req1.input('memb___id', sql.VarChar(10), username);
         req1.input('wcoin', sql.Int, wcoinAmount);
         await req1.query(`
-          IF EXISTS (SELECT 1 FROM T_InGameShop_Point WHERE memb___id = @memb___id)
-            UPDATE T_InGameShop_Point SET WCoinC = WCoinC + @wcoin WHERE memb___id = @memb___id;
+          IF EXISTS (SELECT 1 FROM CashShopData WHERE AccountID = @memb___id)
+            UPDATE CashShopData SET WCoinC = ISNULL(WCoinC, 0) + @wcoin WHERE AccountID = @memb___id;
           ELSE
-            INSERT INTO T_InGameShop_Point (memb___id, WCoinC, WCoinP, GoblinPoint) VALUES (@memb___id, @wcoin, 0, 0);
+            INSERT INTO CashShopData (AccountID, WCoinC, WCoinP, GoblinPoint) VALUES (@memb___id, @wcoin, 0, 0);
         `);
 
         // Check if RMT_Transactions table exists, if not create it
