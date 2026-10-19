@@ -30,6 +30,7 @@ export default function Navbar() {
     { label: 'Início', href: '/' },
     { label: 'Downloads', href: '/downloads' },
     { label: 'Rankings', href: '/rankings' },
+    { label: 'Shop do Jogo', href: '/shop' },
     { label: 'WebShop / Doar', href: '/donate' },
     { label: 'Painel do Jogador', href: '/dashboard' },
   ];
@@ -213,3 +214,4 @@ export default function Navbar() {
     </header>
   );
 }
+

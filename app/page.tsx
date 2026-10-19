@@ -134,7 +134,7 @@ export default function HomePage() {
             {/* CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-2">
               <Link
-                href="http://82.38.28.139/download/Launcher.exe"
+                href="/downloads"
                 className="flex items-center gap-2.5 px-6 py-3.5 bg-gradient-to-r from-amber-400 via-amber-500 to-yellow-500 hover:from-amber-300 hover:to-amber-400 text-black font-bold text-sm rounded shadow-lg shadow-amber-500/25 transition-all transform hover:-translate-y-0.5 whitespace-nowrap"
               >
                 <Download className="w-5 h-5 text-black" />
@@ -146,6 +146,13 @@ export default function HomePage() {
               >
                 <UserPlus className="w-4 h-4 text-amber-400" />
                 <span>Criar Conta Gratuita</span>
+              </Link>
+              <Link
+                href="/shop"
+                className="flex items-center gap-2 px-6 py-3.5 bg-[#14171d]/90 hover:bg-[#1a1f28] text-amber-300 border border-amber-500/40 hover:border-amber-400 font-semibold text-sm rounded transition-all whitespace-nowrap"
+              >
+                <Coins className="w-4 h-4" />
+                <span>Visitar Shop do Jogo</span>
               </Link>
             </div>
 
@@ -429,3 +436,4 @@ export default function HomePage() {
     </div>
   );
 }
+

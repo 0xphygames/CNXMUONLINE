@@ -74,20 +74,20 @@ function getInitialMockStore(): MockStore {
     accounts: [
       {
         memb___id: 'admin',
-        memb__passwd: 'admin123',
-        mail_addr: 'admin@muonline-s6.com',
+        memb__passwd: '',
+        mail_addr: 'admin@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'conqueror',
-        memb__passwd: 'mu123456',
-        mail_addr: 'player1@gmail.com',
+        memb__passwd: '',
+        mail_addr: 'player1@example.invalid',
         bloc_code: '0',
       },
       {
         memb___id: 'valkyrie',
-        memb__passwd: 'mu123456',
-        mail_addr: 'player2@gmail.com',
+        memb__passwd: '',
+        mail_addr: 'player2@example.invalid',
         bloc_code: '0',
       },
     ],
@@ -354,6 +354,24 @@ export interface RmtTransactionRow {
   created_at: string;
 }
 
+export interface WebShopProductRow {
+  ProductID: number;
+  CategoryID: number;
+  Slug: string;
+  Name: string;
+  Description?: string;
+  Currency: 'C' | 'P' | 'G';
+  Price: number;
+  Quantity: number;
+  InventoryType: number;
+  PackageMainIndex?: number;
+  ProductBaseIndex: number;
+  ProductMainIndex: number;
+  ProductType?: number;
+  CategorySlug: string;
+  CategoryName: string;
+}
+
 export const MuDatabase = {
   /**
    * Find account by memb___id (Prepared Statement)
@@ -536,6 +554,59 @@ export const MuDatabase = {
       memb___id: username,
       ...points,
     };
+  },
+
+  async getWebShopProducts(): Promise<WebShopProductRow[]> {
+    const pool = await getDbPool();
+    if (pool) {
+      const result = await pool.request().query<WebShopProductRow>(`
+        SELECT p.ProductID, p.CategoryID, p.Slug, p.Name, p.Description,
+          p.Currency, p.Price, p.Quantity, p.InventoryType, p.PackageMainIndex,
+          p.ProductBaseIndex, p.ProductMainIndex, p.ProductType,
+          c.Slug AS CategorySlug, c.Name AS CategoryName
+        FROM dbo.WebShopProduct p
+        INNER JOIN dbo.WebShopCategory c ON c.CategoryID = p.CategoryID
+        WHERE p.IsActive = 1 AND c.IsActive = 1
+        ORDER BY c.SortOrder, p.SortOrder, p.ProductID
+      `);
+      return result.recordset;
+    }
+    return [];
+  },
+
+  async purchaseWebShopProduct(
+    username: string,
+    productId: number,
+    quantity: number,
+    characterName?: string,
+  ): Promise<{ orderId: number }> {
+    const pool = await getDbPool();
+    if (!pool) throw new Error('Banco de dados indisponível.');
+    const req = pool.request();
+    req.input('AccountID', sql.VarChar(10), username);
+    req.input('ProductID', sql.Int, productId);
+    req.input('Quantity', sql.Int, quantity);
+    req.input('CharacterName', sql.VarChar(10), characterName || null);
+    req.output('OrderID', sql.BigInt);
+    await req.execute('dbo.WebShopPurchase');
+    return { orderId: Number(req.parameters.OrderID.value) };
+  },
+
+  async getWebShopChest(username: string) {
+    const pool = await getDbPool();
+    if (!pool) return [];
+    const req = pool.request();
+    req.input('AccountID', sql.VarChar(10), username);
+    const result = await req.query(`
+      SELECT d.DeliveryID, d.OrderID, d.BaseItemCode, d.DeliveryStatus,
+        d.DeliveredAt, p.Name, p.Slug, p.Currency, p.Price
+      FROM dbo.WebShopDelivery d
+      INNER JOIN dbo.WebShopOrderItem oi ON oi.OrderItemID = d.OrderItemID
+      INNER JOIN dbo.WebShopProduct p ON p.ProductID = oi.ProductID
+      WHERE d.AccountID = @AccountID AND d.DeliveryStatus = 'DELIVERED'
+      ORDER BY d.DeliveredAt DESC
+    `);
+    return result.recordset;
   },
 
   /**
