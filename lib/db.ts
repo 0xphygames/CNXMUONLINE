@@ -618,6 +618,27 @@ export const MuDatabase = {
     await req.execute('dbo.WebShopClaimDelivery');
   },
 
+  async getVirtualBankItems(username: string) {
+    const pool = await getDbPool();
+    if (!pool) return [];
+    const req = pool.request();
+    req.input('AccountID', sql.VarChar(10), username);
+    const result = await req.query(`SELECT VirtualItemID, SourceSlot, DepositedAt FROM dbo.WebShopVirtualBankItem WHERE AccountID=@AccountID AND Status='AVAILABLE' ORDER BY VirtualItemID DESC`);
+    return result.recordset;
+  },
+
+  async depositWarehouseItem(username: string, slot: number) {
+    const pool = await getDbPool(); if (!pool) throw new Error('Banco de dados indisponível.');
+    const req = pool.request(); req.input('AccountID', sql.VarChar(10), username); req.input('Slot', sql.Int, slot); req.output('VirtualItemID', sql.BigInt);
+    await req.execute('dbo.WebShopDepositWarehouseItem'); return Number(req.parameters.VirtualItemID.value);
+  },
+
+  async withdrawVirtualBankItem(username: string, virtualItemId: number) {
+    const pool = await getDbPool(); if (!pool) throw new Error('Banco de dados indisponível.');
+    const req = pool.request(); req.input('AccountID', sql.VarChar(10), username); req.input('VirtualItemID', sql.BigInt, virtualItemId); req.output('Slot', sql.Int);
+    await req.execute('dbo.WebShopWithdrawWarehouseItem'); return Number(req.parameters.Slot.value);
+  },
+
   /**
    * Add WCoinC to account and log RMT transaction
    */
