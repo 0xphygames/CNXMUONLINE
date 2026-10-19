@@ -1,5 +1,11 @@
-Get-Content: 
-Line |
-   2 |  Get-Content -Raw 'app\\api\\shop\\products\\route.ts'
-     |  ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
-     | Cannot find path 'D:\IA\MU ONLINE\app\api\shop\products\route.ts' because it does not exist.
+import { NextResponse } from 'next/server';
+import { MuDatabase } from '@/lib/db';
+
+export async function GET() {
+  try {
+    return NextResponse.json({ success: true, products: await MuDatabase.getWebShopProducts() });
+  } catch (error) {
+    return NextResponse.json({ success: false, message: (error as Error).message }, { status: 500 });
+  }
+}
+
