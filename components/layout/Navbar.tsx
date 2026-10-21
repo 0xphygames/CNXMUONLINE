@@ -11,19 +11,26 @@ export default function Navbar() {
   const { user, logout } = useAuth();
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
-  const [serverOnline, setServerOnline] = useState(false);
+  const [serverOnline, setServerOnline] = useState<boolean | null>(null);
+  const [siteOnline, setSiteOnline] = useState<boolean | null>(null);
 
   useEffect(() => {
-    // Fetch live status
-    fetch('/api/status')
+    const loadStatus = () => fetch('/api/status', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
-        if (data.success && data.stats) {
-          setOnlineCount(Number(data.stats.onlinePlayers ?? 0));
-          setServerOnline(data.stats.connectServerStatus === 'Online');
-        }
+        setSiteOnline(data.success === true && data.site?.status === 'online');
+        setServerOnline(data.success === true && data.game?.status === 'online');
+        setOnlineCount(data.game?.playersOnline == null ? null : Number(data.game.playersOnline));
       })
-      .catch(() => {});
+      .catch(() => {
+        setSiteOnline(false);
+        setServerOnline(null);
+        setOnlineCount(null);
+      });
+
+    loadStatus();
+    const interval = window.setInterval(loadStatus, 30_000);
+    return () => window.clearInterval(interval);
   }, []);
 
   const navLinks = [
@@ -43,12 +50,12 @@ export default function Navbar() {
           <div className="flex items-center gap-3">
             <span className="flex items-center gap-1.5 font-medium text-slate-300">
               <span className={`inline-block w-2 h-2 rounded-full ${serverOnline ? 'bg-emerald-500' : 'bg-rose-500'}`} />
-              ConnectServer: <span className="text-emerald-400">{serverOnline ? 'Online' : 'Offline'}</span>
+              Site: <span className={siteOnline === true ? 'text-emerald-400' : siteOnline === false ? 'text-rose-400' : 'text-slate-400'}>{siteOnline === true ? 'Online' : siteOnline === false ? 'Offline' : '—'}</span>
             </span>
             <span className="hidden sm:inline text-slate-600">·</span>
-            <span className="hidden sm:inline text-slate-300">GameServer Sub-1: <span className="text-emerald-400">PVP (Normal)</span></span>
+            <span className="hidden sm:inline text-slate-300">Jogo: <span className={serverOnline === true ? 'text-emerald-400' : serverOnline === false ? 'text-rose-400' : 'text-slate-400'}>{serverOnline === true ? 'Online' : serverOnline === false ? 'Offline' : 'Indisponível'}</span></span>
             <span className="hidden md:inline text-slate-600">·</span>
-            <span className="hidden md:inline text-slate-300">GameServer Sub-2: <span className="text-sky-400">VIP Gold</span></span>
+            <span className="hidden md:inline text-slate-300">Sub-1: <span className="text-sky-400">PVP</span> · Sub-2: <span className="text-sky-400">VIP Gold</span></span>
           </div>
           <div className="flex items-center gap-3 tabular-nums">
             <span className="text-slate-400">
@@ -214,4 +221,3 @@ export default function Navbar() {
     </header>
   );
 }
-
