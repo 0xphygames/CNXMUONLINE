@@ -196,7 +196,6 @@ function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[nu
   return (
     <button
       type="button"
-      title={`${item.slotName}: ${item.name} · Durabilidade ${item.durability}`}
       aria-label={`${item.slotName}: ${item.name}`}
       onMouseEnter={() => setActive(true)}
       onMouseLeave={() => setActive(false)}
@@ -216,7 +215,9 @@ function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[nu
         className={`pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-max max-w-[min(15rem,70vw)] -translate-x-1/2 rounded-lg border border-amber-300/50 bg-[#120f0a]/95 px-3 py-2 text-left text-xs text-white shadow-xl shadow-black/70 transition ${active ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'}`}
       >
         <strong className="block text-amber-200">{item.name}</strong>
-        <span className="block text-slate-300">{item.slotName} · {item.category}</span>
+        <span className="block text-slate-300">
+          {item.slotName}{item.category !== item.slotName ? ` · ${item.category}` : ''}
+        </span>
         <span className="block text-slate-300">Durabilidade: {item.durability}</span>
         <span className="mt-1 block text-amber-100">Nível: +{item.level}{item.optionLevel ? ` · Opção +${item.optionLevel}` : ''}</span>
         {item.skill && <span className="block text-cyan-300">Skill</span>}
