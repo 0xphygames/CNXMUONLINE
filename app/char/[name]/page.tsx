@@ -117,23 +117,32 @@ export default function CharacterPage() {
       )}
 
       {!c.hidden && (
-        <section className="mt-6 rounded-xl border border-white/10 bg-[#0d1017] p-6">
-          <h2 className="text-lg font-semibold text-white mb-4">Equipamentos</h2>
-          {c.equipment && c.equipment.length > 0 ? (
-            <ul className="grid gap-3 md:grid-cols-2">
-              {c.equipment.map((item) => (
-                <li key={item.slot} className="rounded-lg bg-white/5 p-3">
-                  <p className="text-xs text-slate-400">{item.slotName}</p>
-                  <p className="font-semibold text-white">{item.name}</p>
-                  <p className="text-xs text-slate-400">
-                    {item.category} · Durabilidade {item.durability}
-                  </p>
-                </li>
-              ))}
-            </ul>
-          ) : (
-            <p className="text-slate-400">Nenhum equipamento visível.</p>
-          )}
+        <section
+          className="relative mt-6 overflow-hidden rounded-xl border border-white/10 bg-[#0d1017] p-6"
+          style={{
+            backgroundImage: "linear-gradient(rgba(13,16,23,.88), rgba(13,16,23,.94)), url('/images/mu-inventory-box.jpg')",
+            backgroundPosition: 'center',
+            backgroundSize: 'cover',
+          }}
+        >
+          <div className="relative">
+            <h2 className="text-lg font-semibold text-white mb-4">Equipamentos</h2>
+            {c.equipment && c.equipment.length > 0 ? (
+              <ul className="grid gap-3 md:grid-cols-2">
+                {c.equipment.map((item) => (
+                  <li key={item.slot} className="rounded-lg border border-white/10 bg-black/40 p-3 backdrop-blur-sm">
+                    <p className="text-xs text-slate-400">{item.slotName}</p>
+                    <p className="font-semibold text-white">{item.name}</p>
+                    <p className="text-xs text-slate-400">
+                      {item.category} · Durabilidade {item.durability}
+                    </p>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-slate-400">Nenhum equipamento visível.</p>
+            )}
+          </div>
         </section>
       )}
     </Shell>
