@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState, useEffect, useCallback, Suspense } from 'react';
+import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
 import { Trophy, Search, Shield, Crown, Swords, Users, Sparkles, RefreshCw } from 'lucide-react';
 import { MU_CLASSES, getClassName } from '@/lib/mu-constants';
@@ -280,7 +281,12 @@ function RankingsContent() {
                           </span>
                         </td>
                         <td className="py-3.5 px-4 font-bold text-white text-sm">
-                          {char.Name}
+                          <Link
+                            href={`/char/${encodeURIComponent(char.Name)}`}
+                            className="hover:text-amber-400 transition-colors"
+                          >
+                            {char.Name}
+                          </Link>
                         </td>
                         <td className="py-3.5 px-4">
                           <span
