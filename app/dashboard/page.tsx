@@ -134,7 +134,11 @@ export default function DashboardPage() {
   };
 
   return (
-    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 space-y-8">
+    <div
+      className="min-h-screen bg-[#080a0e] bg-cover bg-fixed bg-center px-4 py-10 sm:px-6 lg:px-8"
+      style={{ backgroundImage: "linear-gradient(rgba(8,10,14,.88), rgba(8,10,14,.96)), url('/images/mu_season6_classes_1791666426349.jpg')" }}
+    >
+      <div className="mx-auto max-w-7xl space-y-8">
       {/* Account Overview Header */}
       <div className="border-b border-[#222733] pb-6 flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
@@ -486,6 +490,7 @@ export default function DashboardPage() {
             </div>
           )}
         </div>
+      </div>
       </div>
 
       {/* Change Password Modal */}
