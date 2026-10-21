@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MuDatabase } from '@/lib/db';
+import { SESSION_COOKIE, createSessionToken } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
   try {
@@ -66,6 +67,18 @@ export async function POST(req: NextRequest) {
       path: '/',
       maxAge: 60 * 60 * 24 * 7, // 7 days
     });
+
+    // Sessão assinada, usada por ações sensíveis (ex.: ocultação VIP).
+    const signed = createSessionToken(account.memb___id);
+    if (signed) {
+      response.cookies.set(SESSION_COOKIE, signed, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        path: '/',
+        maxAge: 60 * 60 * 24 * 7,
+      });
+    }
 
     return response;
   } catch (error) {

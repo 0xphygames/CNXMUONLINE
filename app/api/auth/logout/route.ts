@@ -12,5 +12,11 @@ export async function POST() {
     maxAge: 0,
   });
 
+  response.cookies.set('mu_session', '', {
+    httpOnly: true,
+    path: '/',
+    maxAge: 0,
+  });
+
   return response;
 }

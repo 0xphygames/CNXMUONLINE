@@ -1,0 +1,77 @@
+// Decodificador somente leitura de Character.Inventory (equipamentos).
+// Registros de 16 bytes. Campos validados contra itens reais:
+//   byte 0  = índice do item dentro do grupo
+//   byte 2  = durabilidade atual
+//   byte 9  = grupo (parte alta do nibble)
+// Slots de equipamento validados: ver EQUIPMENT_SLOTS. Os demais não são exibidos.
+
+import catalog from './item-catalog.json';
+
+const RECORD_SIZE = 16;
+const EMPTY = 0xff;
+
+export const EQUIPMENT_SLOTS: Record<number, string> = {
+  0: 'Mão direita',
+  1: 'Mão esquerda',
+  2: 'Capacete',
+  3: 'Armadura',
+  4: 'Calça',
+  5: 'Luvas',
+  6: 'Botas',
+  8: 'Pet',
+  10: 'Colar',
+};
+
+const GROUP_CATEGORY: Record<number, string> = {
+  5: 'Cajado',
+  6: 'Escudo',
+  7: 'Capacete',
+  8: 'Armadura',
+  9: 'Calça',
+  10: 'Luvas',
+  11: 'Botas',
+};
+
+type CatalogEntry = { g: number; i: number; s: number; n: string };
+const index = new Map<string, CatalogEntry>();
+for (const entry of catalog as CatalogEntry[]) {
+  index.set(`${entry.g}:${entry.i}`, entry);
+}
+
+export type EquippedItem = {
+  slot: number;
+  slotName: string;
+  group: number;
+  index: number;
+  name: string;
+  category: string;
+  durability: number;
+};
+
+export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
+  const result: EquippedItem[] = [];
+
+  for (const slot of Object.keys(EQUIPMENT_SLOTS).map(Number)) {
+    const start = slot * RECORD_SIZE;
+    if (start + RECORD_SIZE > inventory.length) continue;
+
+    const record = inventory.subarray(start, start + RECORD_SIZE);
+    if (record[0] === EMPTY) continue;
+
+    const group = record[9] >> 4;
+    const itemIndex = record[0];
+    const entry = index.get(`${group}:${itemIndex}`);
+
+    result.push({
+      slot,
+      slotName: EQUIPMENT_SLOTS[slot],
+      group,
+      index: itemIndex,
+      name: entry?.n ?? 'Item desconhecido',
+      category: GROUP_CATEGORY[group] ?? (entry?.s === 8 ? 'Pet' : entry?.s === 10 ? 'Colar/Anel' : 'Outro'),
+      durability: record[2],
+    });
+  }
+
+  return result;
+}

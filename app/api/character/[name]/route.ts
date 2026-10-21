@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import sql from 'mssql';
 import { getDbPool } from '@/lib/db';
+import { decodeEquipment } from '@/lib/char-equipment';
 
 // Nome de personagem MU: 1 a 10 caracteres, letras, números e underscore.
 const CHAR_NAME_RE = /^[A-Za-z0-9_]{1,10}$/;
@@ -31,6 +32,7 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ nam
         c.MasterResetCount,
         c.MapNumber,
         c.Strength, c.Dexterity, c.Vitality, c.Energy, c.Leadership,
+        c.Inventory,
         gm.G_Name AS GuildName,
         ms.ConnectStat,
         sp.Invisible
@@ -77,6 +79,8 @@ export async function GET(_req: NextRequest, { params }: { params: Promise<{ nam
         },
         map: row.MapNumber,
         online: row.ConnectStat === 1,
+        // Somente equipamentos equipados. Inventário e armazém nunca são retornados.
+        equipment: decodeEquipment(new Uint8Array(row.Inventory ?? [])),
       },
     });
   } catch (error) {
