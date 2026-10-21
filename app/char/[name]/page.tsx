@@ -26,6 +26,11 @@ type CharData = {
     durability: number;
     visualKey: string;
     visualPath: string;
+    level: number;
+    skill: boolean;
+    luck: boolean;
+    optionLevel: number;
+    options: string[];
   }[];
 };
 
@@ -186,21 +191,42 @@ const EQUIPMENT_MARKERS: Record<number, { left: string; top: string; width: stri
 };
 
 function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[number] }) {
+  const [active, setActive] = useState(false);
   const marker = EQUIPMENT_MARKERS[item.slot] ?? { left: '38%', top: '80%', width: '24%', height: '18%' };
   return (
-    <div
+    <button
+      type="button"
       title={`${item.slotName}: ${item.name} · Durabilidade ${item.durability}`}
       aria-label={`${item.slotName}: ${item.name}`}
-      className="absolute z-10 flex items-center justify-center overflow-hidden"
+      onMouseEnter={() => setActive(true)}
+      onMouseLeave={() => setActive(false)}
+      onFocus={() => setActive(true)}
+      onBlur={() => setActive(false)}
+      className="group absolute z-10 flex cursor-help items-center justify-center overflow-visible rounded-md border border-transparent transition hover:border-amber-300/80 hover:bg-amber-200/10 focus:border-amber-300 focus:bg-amber-200/10 focus:outline-none"
       style={{ left: marker.left, top: marker.top, width: marker.width, height: marker.height }}
     >
       <img
         src={item.visualPath}
         alt={item.name}
         className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.9)]"
-        onError={(event) => event.currentTarget.remove()}
+        onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
       />
-    </div>
+      <span
+        role="tooltip"
+        className={`pointer-events-none absolute bottom-full left-1/2 z-30 mb-2 w-max max-w-[min(15rem,70vw)] -translate-x-1/2 rounded-lg border border-amber-300/50 bg-[#120f0a]/95 px-3 py-2 text-left text-xs text-white shadow-xl shadow-black/70 transition ${active ? 'visible translate-y-0 opacity-100' : 'invisible translate-y-1 opacity-0'}`}
+      >
+        <strong className="block text-amber-200">{item.name}</strong>
+        <span className="block text-slate-300">{item.slotName} · {item.category}</span>
+        <span className="block text-slate-300">Durabilidade: {item.durability}</span>
+        <span className="mt-1 block text-amber-100">Nível: +{item.level}{item.optionLevel ? ` · Opção +${item.optionLevel}` : ''}</span>
+        {item.skill && <span className="block text-cyan-300">Skill</span>}
+        {item.luck && <span className="block text-green-300">Luck</span>}
+        {item.options.map((option) => (
+          <span key={option} className="block text-emerald-300">Excelente: {option}</span>
+        ))}
+        <span className="block text-[10px] text-slate-500">Grupo {item.group} · Índice {item.index}</span>
+      </span>
+    </button>
   );
 }
 
