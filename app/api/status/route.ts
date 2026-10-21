@@ -9,6 +9,11 @@ export async function GET() {
 
     return NextResponse.json({
       success: true,
+      site: { status: 'online' as const },
+      game: {
+        status: stats.onlinePlayersSource === 'sql' ? 'online' : 'unknown',
+        playersOnline: stats.onlinePlayersSource === 'sql' ? stats.onlinePlayers : null,
+      },
       stats,
       events: eventTimers,
       timestamp: new Date().toISOString(),

@@ -21,6 +21,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import { MU_CLASSES, getMapName, getPkStatus } from '@/lib/mu-constants';
+import CharacterPrivacyToggle from '@/components/character-privacy-toggle';
 
 export default function DashboardPage() {
   const router = useRouter();
@@ -326,6 +327,9 @@ export default function DashboardPage() {
                     </span>
                   </div>
                 </div>
+
+                {/* Perfil público (VIP) */}
+                <CharacterPrivacyToggle name={activeChar.Name} />
 
                 {/* Character Stats Matrix */}
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 text-xs">

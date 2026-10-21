@@ -1,9 +1,54 @@
 import { NextRequest, NextResponse } from 'next/server';
-import sql from 'mssql';
 import { getDbPool } from '@/lib/db';
 import { SESSION_COOKIE, verifySessionToken } from '@/lib/session';
 
 const CHAR_NAME_RE = /^[A-Za-z0-9_]{1,10}$/;
+
+// Lê o estado de privacidade. Somente o dono da conta recebe a resposta.
+export async function GET(req: NextRequest, { params }: { params: Promise<{ name: string }> }) {
+  const { name } = await params;
+
+  const accountId = verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value);
+  if (!accountId) {
+    return NextResponse.json({ success: false, error: 'Não autenticado' }, { status: 401 });
+  }
+
+  if (!CHAR_NAME_RE.test(name)) {
+    return NextResponse.json({ success: false, error: 'Nome inválido' }, { status: 400 });
+  }
+
+  const pool = await getDbPool();
+  if (!pool) {
+    return NextResponse.json({ success: false, error: 'Banco indisponível' }, { status: 503 });
+  }
+
+  try {
+    const result = await pool.request()
+      .input('name', name)
+      .input('acc', accountId)
+      .query(`
+        SELECT TOP 1 c.Name, sp.Invisible, v.VipUntil
+        FROM dbo.Character c
+        LEFT JOIN dbo.SiteCharPrivacy sp ON sp.CharName = c.Name
+        LEFT JOIN dbo.SiteVipAccount v ON v.AccountID = c.AccountID
+        WHERE c.Name = @name AND c.AccountID = @acc
+      `);
+
+    const row = result.recordset[0];
+    if (!row) {
+      return NextResponse.json({ success: false, error: 'Personagem não pertence à conta' }, { status: 403 });
+    }
+
+    const isVip = Boolean(row.VipUntil && new Date(row.VipUntil).getTime() > Date.now());
+    return NextResponse.json({
+      success: true,
+      data: { name: row.Name, invisible: row.Invisible === true, isVip },
+    });
+  } catch (error) {
+    console.error('[privacy:get] falhou:', (error as Error).message);
+    return NextResponse.json({ success: false, error: 'Erro ao consultar privacidade' }, { status: 500 });
+  }
+}
 
 // Ativa ou desativa o modo invisível de um personagem.
 // Exige sessão assinada, posse do personagem e VIP ativo.
@@ -59,7 +104,7 @@ export async function POST(req: NextRequest, { params }: { params: Promise<{ nam
     await pool.request()
       .input('name', name)
       .input('acc', accountId)
-      .input('inv', sql.Bit, body.invisible ? 1 : 0)
+      .input('inv', body.invisible ? 1 : 0)
       .query(`
         MERGE dbo.SiteCharPrivacy AS target
         USING (SELECT @name AS CharName) AS source
