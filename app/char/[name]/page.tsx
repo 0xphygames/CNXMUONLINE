@@ -16,6 +16,7 @@ type CharData = {
   attributes?: { strength: number; agility: number; vitality: number; energy: number; command: number };
   map?: number;
   online?: boolean;
+  equipment?: { slot: number; slotName: string; name: string; category: string; durability: number }[];
 };
 
 type State =
@@ -112,6 +113,27 @@ export default function CharacterPage() {
               {c.map !== undefined ? `Mapa ${c.map}` : 'Indisponível'}
             </p>
           </div>
+        </section>
+      )}
+
+      {!c.hidden && (
+        <section className="mt-6 rounded-xl border border-white/10 bg-[#0d1017] p-6">
+          <h2 className="text-lg font-semibold text-white mb-4">Equipamentos</h2>
+          {c.equipment && c.equipment.length > 0 ? (
+            <ul className="grid gap-3 md:grid-cols-2">
+              {c.equipment.map((item) => (
+                <li key={item.slot} className="rounded-lg bg-white/5 p-3">
+                  <p className="text-xs text-slate-400">{item.slotName}</p>
+                  <p className="font-semibold text-white">{item.name}</p>
+                  <p className="text-xs text-slate-400">
+                    {item.category} · Durabilidade {item.durability}
+                  </p>
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p className="text-slate-400">Nenhum equipamento visível.</p>
+          )}
         </section>
       )}
     </Shell>
