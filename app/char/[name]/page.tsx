@@ -207,7 +207,7 @@ function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[nu
       <img
         src={item.visualPath}
         alt={item.name}
-        className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.9)]"
+        className="h-full w-full scale-[1.35] transform-gpu object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.9)]"
         onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }}
       />
       <span

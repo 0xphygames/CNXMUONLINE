@@ -105,7 +105,7 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
       slotName: EQUIPMENT_SLOTS[slot],
       group,
       index: itemIndex,
-      name: entry?.n ?? 'Item desconhecido',
+      name: entry?.n ?? `Item ${group}:${itemIndex}`,
       category: GROUP_CATEGORY[group] ?? (entry?.s === 8 ? 'Pet' : entry?.s === 10 ? 'Colar/Anel' : 'Outro'),
       durability: record[2],
       ...visual,
