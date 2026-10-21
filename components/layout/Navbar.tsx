@@ -13,6 +13,7 @@ export default function Navbar() {
   const [onlineCount, setOnlineCount] = useState<number | null>(null);
   const [serverOnline, setServerOnline] = useState<boolean | null>(null);
   const [siteOnline, setSiteOnline] = useState<boolean | null>(null);
+  const [visitorsOnline, setVisitorsOnline] = useState<number | null>(null);
 
   useEffect(() => {
     const loadStatus = () => fetch('/api/status', { cache: 'no-store' })
@@ -30,7 +31,16 @@ export default function Navbar() {
 
     loadStatus();
     const interval = window.setInterval(loadStatus, 30_000);
-    return () => window.clearInterval(interval);
+    const presence = () => fetch('/api/presence', { cache: 'no-store' })
+      .then((res) => res.json())
+      .then((data) => setVisitorsOnline(data.success ? Number(data.visitorsOnline ?? 0) : null))
+      .catch(() => setVisitorsOnline(null));
+    presence();
+    const presenceInterval = window.setInterval(presence, 30_000);
+    return () => {
+      window.clearInterval(interval);
+      window.clearInterval(presenceInterval);
+    };
   }, []);
 
   const navLinks = [
@@ -59,7 +69,11 @@ export default function Navbar() {
           </div>
           <div className="flex items-center gap-3 tabular-nums">
             <span className="text-slate-400">
-              Jogadores Online: <strong className="text-amber-400 font-semibold">{onlineCount ?? '—'}</strong> / 1500
+              Visitantes: <strong className="text-sky-400 font-semibold">{visitorsOnline ?? '—'}</strong>
+            </span>
+            <span className="text-slate-600">·</span>
+            <span className="text-slate-400">
+              Jogadores: <strong className="text-amber-400 font-semibold">{onlineCount ?? '—'}</strong> / 1500
             </span>
             <span className="text-slate-600">·</span>
             <span className="text-slate-400 hidden sm:inline">Versão: <strong className="text-slate-200">S6 Ep. 3</strong></span>
