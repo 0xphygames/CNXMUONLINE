@@ -33,6 +33,7 @@ export default function DashboardPage() {
   const [chest, setChest] = useState<any[]>([]);
   const [warehouseItems, setWarehouseItems] = useState<any[]>([]);
   const [virtualBankItems, setVirtualBankItems] = useState<any[]>([]);
+  const [bankError, setBankError] = useState<string | null>(null);
   const [transferLoading, setTransferLoading] = useState<number | null>(null);
 
   // Password change state
@@ -52,7 +53,8 @@ export default function DashboardPage() {
   useEffect(() => {
     if (user) fetch('/api/shop/bank', { cache: 'no-store' }).then((res) => res.json()).then((data) => {
       if (data.success) { setWarehouseItems(data.warehouse || []); setVirtualBankItems(data.virtual || []); }
-    }).catch(() => {});
+      else setBankError(data.message || 'Não foi possível carregar os baús da conta.');
+    }).catch(() => setBankError('Não foi possível conectar ao serviço de inventário.'));
   }, [user]);
 
   const transferItem = async (deliveryId: number) => {
@@ -285,6 +287,7 @@ export default function DashboardPage() {
         <div className="border-b border-[#222733] px-6 py-5">
           <h2 className="text-xl font-bold text-white">Inventários da conta</h2>
           <p className="mt-1 text-xs text-slate-400">Itens do baú do jogo e do banco virtual, identificados pelos mesmos grupo e índice do cliente MU.</p>
+          {bankError && <p className="mt-2 text-xs text-rose-300">{bankError}</p>}
         </div>
         <div className="grid gap-5 p-5 lg:grid-cols-2">
           {[
