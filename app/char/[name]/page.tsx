@@ -134,23 +134,18 @@ export default function CharacterPage() {
       {!c.hidden && (
         <section
           className="relative mt-6 overflow-hidden rounded-xl border border-white/10 bg-[#0d1017] p-6"
-          style={{
-            backgroundImage: "linear-gradient(rgba(13,16,23,.88), rgba(13,16,23,.94)), url('/images/mu-inventory-box.jpg')",
-            backgroundPosition: 'center',
-            backgroundSize: 'cover',
-          }}
         >
           <div className="relative">
             <h2 className="text-lg font-semibold text-white mb-4">Equipamentos</h2>
             {c.equipment && c.equipment.length > 0 ? (
               <>
-                <div className="mx-auto w-full max-w-[375px] rounded-lg border border-white/10 bg-black/50 p-2 shadow-2xl">
-                  <div className="relative aspect-[375/425] overflow-hidden rounded-md bg-black">
-                    <img
-                      src="/images/mu-equipment-layout.png"
-                      alt="Layout original dos equipamentos do personagem"
-                      className="absolute inset-0 h-full w-full object-cover"
-                    />
+                <div className="mx-auto w-full max-w-[375px] rounded-lg border border-amber-200/20 bg-[#090b0e] p-2 shadow-2xl">
+                  <div className="relative aspect-[375/425] overflow-hidden rounded-md border border-white/10 bg-[radial-gradient(circle_at_50%_45%,rgba(104,113,122,.28),transparent_48%),linear-gradient(145deg,#242a2d,#0b0d0f_55%,#1d2225)]">
+                    <div className="absolute inset-x-[5%] top-[5%] h-[9%] rounded border border-white/20 bg-black/45 shadow-inner" />
+                    <div className="absolute inset-x-[7%] top-[18%] h-[68%] rounded border border-white/15 bg-black/20 shadow-inner" />
+                    {Object.entries(EQUIPMENT_MARKERS).map(([slot, marker]) => (
+                      <div key={slot} aria-hidden="true" className="absolute rounded border border-white/10 bg-black/25 shadow-inner" style={{ left: marker.left, top: marker.top, width: marker.width, height: marker.height }} />
+                    ))}
                     {c.equipment.map((item) => (
                       <EquipmentMarker key={item.slot} item={item} />
                     ))}
