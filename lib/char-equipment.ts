@@ -119,3 +119,34 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
 
   return result;
 }
+
+export type StorageItem = Omit<EquippedItem, 'slotName'> & {
+  source: 'warehouse' | 'virtual';
+  virtualItemId?: number;
+};
+
+/** Decodifica os slots de 32 bytes do warehouse/baú virtual. */
+export function decodeStorageItems(data: Uint8Array, source: StorageItem['source'], virtualItemId?: number): StorageItem[] {
+  const result: StorageItem[] = [];
+  const recordSize = 32;
+  const empty = new Uint8Array(recordSize).fill(0xff);
+
+  for (let slot = 0; slot < Math.floor(data.length / recordSize); slot += 1) {
+    const record = data.subarray(slot * recordSize, (slot + 1) * recordSize);
+    if (record.every((value, index) => value === empty[index]) || record[0] === EMPTY) continue;
+    const group = record[9] >> 4;
+    const itemIndex = record[0];
+    const entry = index.get(`${group}:${itemIndex}`);
+    const visual = getItemVisual(group, itemIndex);
+    const level = (record[1] >> 3) & 0x0f;
+    const optionLevel = record[1] & 0x03;
+    const skill = (record[1] & 0x80) !== 0;
+    const luck = (record[1] & 0x04) !== 0;
+    const options = EXCELLENT_OPTIONS.filter((_, bit) => (record[3] & (1 << bit)) !== 0);
+    result.push({ slot, source, virtualItemId, group, index: itemIndex,
+      name: entry?.n ?? `Item ${group}:${itemIndex}`,
+      category: GROUP_CATEGORY[group] ?? (entry?.s === 8 ? 'Pet' : entry?.s === 10 ? 'Colar/Anel' : 'Outro'),
+      durability: record[2], ...visual, level, skill, luck, optionLevel, options });
+  }
+  return result;
+}

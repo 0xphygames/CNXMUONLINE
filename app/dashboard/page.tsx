@@ -31,6 +31,9 @@ export default function DashboardPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [feedback, setFeedback] = useState<{ type: 'success' | 'error'; message: string } | null>(null);
   const [chest, setChest] = useState<any[]>([]);
+  const [warehouseItems, setWarehouseItems] = useState<any[]>([]);
+  const [virtualBankItems, setVirtualBankItems] = useState<any[]>([]);
+  const [bankError, setBankError] = useState<string | null>(null);
   const [transferLoading, setTransferLoading] = useState<number | null>(null);
 
   // Password change state
@@ -45,6 +48,13 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (user) fetch('/api/shop/chest').then((res) => res.json()).then((data) => { if (data.success) setChest(data.items); }).catch(() => {});
+  }, [user]);
+
+  useEffect(() => {
+    if (user) fetch('/api/shop/bank', { cache: 'no-store' }).then((res) => res.json()).then((data) => {
+      if (data.success) { setWarehouseItems(data.warehouse || []); setVirtualBankItems(data.virtual || []); }
+      else setBankError(data.message || 'Não foi possível carregar os baús da conta.');
+    }).catch(() => setBankError('Não foi possível conectar ao serviço de inventário.'));
   }, [user]);
 
   const transferItem = async (deliveryId: number) => {
@@ -271,6 +281,32 @@ export default function DashboardPage() {
             </div>
           </div>
         )}
+      </section>
+
+      <section className="overflow-hidden rounded-xl border border-amber-500/30 bg-[#17130d]/95">
+        <div className="border-b border-amber-500/20 px-6 py-5">
+          <h2 className="text-xl font-bold text-white">Banco da conta</h2>
+          <p className="mt-1 text-xs text-slate-400">Itens e Zen nos bancos do jogo e do site</p>
+          {bankError && <p className="mt-2 text-xs text-rose-300">{bankError}</p>}
+        </div>
+        <div className="grid gap-5 p-5 lg:grid-cols-2">
+          {[
+            { title: 'Jogo Banco', items: warehouseItems },
+            { title: 'Banco do Site', items: virtualBankItems },
+          ].map((bank) => (
+            <div key={bank.title} className="rounded-xl border border-amber-500/30 bg-[#21190d] p-3 shadow-xl">
+              <div className="mb-3 flex items-center justify-between rounded-lg border-b border-amber-500/20 px-2 pb-3"><h3 className="font-bold text-white">{bank.title}</h3><span className="rounded-full bg-black/40 px-2 py-1 text-xs text-amber-200">ZEN 0</span></div>
+              <div className="grid grid-cols-8 overflow-hidden rounded border border-[#4b3a1b] bg-[#080905]">
+                {Array.from({ length: 120 }, (_, slot) => {
+                  const item = bank.items.find((candidate: any) => candidate.slot === slot);
+                  return <div key={slot} className="group relative aspect-square border border-[#302817] bg-black/20 p-0.5 hover:bg-amber-400/10">
+                    {item && <div title={`${item.name} · Durabilidade ${item.durability}`} className="absolute inset-0 z-10 flex items-center justify-center"><img src={item.visualPath} alt={item.name} className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.95)]" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} /><span className="pointer-events-none absolute bottom-0 left-0 right-0 truncate bg-black/90 px-1 py-0.5 text-center text-[8px] text-white opacity-0 transition group-hover:opacity-100">{item.name}</span></div>}
+                  </div>;
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
       </section>
 
       {/* Characters & Management Grid */}

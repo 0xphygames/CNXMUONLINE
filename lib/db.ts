@@ -621,10 +621,29 @@ export const MuDatabase = {
   async getVirtualBankItems(username: string) {
     const pool = await getDbPool();
     if (!pool) return [];
-    const req = pool.request();
-    req.input('AccountID', sql.VarChar(10), username);
-    const result = await req.query(`SELECT VirtualItemID, SourceSlot, DepositedAt FROM dbo.WebShopVirtualBankItem WHERE AccountID=@AccountID AND Status='AVAILABLE' ORDER BY VirtualItemID DESC`);
-    return result.recordset;
+    try {
+      const req = pool.request();
+      req.input('AccountID', sql.VarChar(10), username);
+      const result = await req.query(`SELECT VirtualItemID, SourceSlot, ItemData, DepositedAt FROM dbo.WebShopVirtualBankItem WHERE LOWER(AccountID)=LOWER(@AccountID) AND Status='AVAILABLE' ORDER BY VirtualItemID DESC`);
+      return result.recordset;
+    } catch (error) {
+      console.warn('[MSSQL virtual bank unavailable]:', (error as Error).message);
+      return [];
+    }
+  },
+
+  async getGameWarehouse(username: string) {
+    const pool = await getDbPool();
+    if (!pool) return null;
+    try {
+      const req = pool.request();
+      req.input('AccountID', sql.VarChar(10), username);
+      const result = await req.query(`SELECT TOP 1 Items FROM dbo.warehouse WHERE LOWER(AccountID)=LOWER(@AccountID)`);
+      return result.recordset[0]?.Items ?? null;
+    } catch (error) {
+      console.warn('[MSSQL warehouse unavailable]:', (error as Error).message);
+      return null;
+    }
   },
 
   async depositWarehouseItem(username: string, slot: number) {
