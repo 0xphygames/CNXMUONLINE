@@ -26,6 +26,11 @@ type CharData = {
     durability: number;
     visualKey: string;
     visualPath: string;
+    level: number;
+    skill: boolean;
+    luck: boolean;
+    optionLevel: number;
+    options: string[];
   }[];
 };
 
@@ -213,6 +218,12 @@ function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[nu
         <strong className="block text-amber-200">{item.name}</strong>
         <span className="block text-slate-300">{item.slotName} · {item.category}</span>
         <span className="block text-slate-300">Durabilidade: {item.durability}</span>
+        <span className="mt-1 block text-amber-100">Nível: +{item.level}{item.optionLevel ? ` · Opção +${item.optionLevel}` : ''}</span>
+        {item.skill && <span className="block text-cyan-300">Skill</span>}
+        {item.luck && <span className="block text-green-300">Luck</span>}
+        {item.options.map((option) => (
+          <span key={option} className="block text-emerald-300">Excelente: {option}</span>
+        ))}
         <span className="block text-[10px] text-slate-500">Grupo {item.group} · Índice {item.index}</span>
       </span>
     </button>

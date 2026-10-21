@@ -48,7 +48,21 @@ export type EquippedItem = {
   durability: number;
   visualKey: string;
   visualPath: string;
+  level: number;
+  skill: boolean;
+  luck: boolean;
+  optionLevel: number;
+  options: string[];
 };
+
+const EXCELLENT_OPTIONS = [
+  'Dano excelente',
+  'Taxa de dano excelente',
+  'Defesa excelente',
+  'Reflete dano',
+  'Aumenta mana máxima',
+  'Aumenta vida máxima',
+];
 
 /**
  * Assets publicados seguem a chave do cliente MU: grupo + índice do item.
@@ -80,6 +94,11 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
     const itemIndex = record[0];
     const entry = index.get(`${group}:${itemIndex}`);
     const visual = getItemVisual(group, itemIndex);
+    const level = (record[1] >> 3) & 0x0f;
+    const optionLevel = record[1] & 0x03;
+    const skill = (record[1] & 0x80) !== 0;
+    const luck = (record[1] & 0x04) !== 0;
+    const options = EXCELLENT_OPTIONS.filter((_, bit) => (record[3] & (1 << bit)) !== 0);
 
     result.push({
       slot,
@@ -90,6 +109,11 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
       category: GROUP_CATEGORY[group] ?? (entry?.s === 8 ? 'Pet' : entry?.s === 10 ? 'Colar/Anel' : 'Outro'),
       durability: record[2],
       ...visual,
+      level,
+      skill,
+      luck,
+      optionLevel,
+      options,
     });
   }
 
