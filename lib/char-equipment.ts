@@ -60,7 +60,9 @@ export function getItemVisual(group: number, itemIndex: number) {
   const visualKey = `${group}_${itemIndex}`;
   return {
     visualKey,
-    visualPath: `/images/items/${visualKey}.webp`,
+    // OpenMU publica o ícone base no formato item_grupo_indice_nivel.png.
+    // Usamos nível 0 para não confundir o visual com o level do item equipado.
+    visualPath: `/images/items/item_${group}_${itemIndex}_0.png`,
   };
 }
 
