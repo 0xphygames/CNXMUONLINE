@@ -283,29 +283,27 @@ export default function DashboardPage() {
         )}
       </section>
 
-      <section className="overflow-hidden rounded-xl border border-amber-500/30 bg-[#12151c]">
-        <div className="border-b border-[#222733] px-6 py-5">
-          <h2 className="text-xl font-bold text-white">Inventários da conta</h2>
-          <p className="mt-1 text-xs text-slate-400">Itens do baú do jogo e do banco virtual, identificados pelos mesmos grupo e índice do cliente MU.</p>
+      <section className="overflow-hidden rounded-xl border border-amber-500/30 bg-[#17130d]/95">
+        <div className="border-b border-amber-500/20 px-6 py-5">
+          <h2 className="text-xl font-bold text-white">Banco da conta</h2>
+          <p className="mt-1 text-xs text-slate-400">Itens e Zen nos bancos do jogo e do site</p>
           {bankError && <p className="mt-2 text-xs text-rose-300">{bankError}</p>}
         </div>
         <div className="grid gap-5 p-5 lg:grid-cols-2">
           {[
-            { title: 'Baú do jogo', items: warehouseItems, empty: 'Nenhum item encontrado no warehouse.' },
-            { title: 'Banco virtual', items: virtualBankItems, empty: 'Nenhum item disponível no banco virtual.' },
+            { title: 'Jogo Banco', items: warehouseItems },
+            { title: 'Banco do Site', items: virtualBankItems },
           ].map((bank) => (
-            <div key={bank.title} className="rounded-lg border border-[#343a48] bg-[#090b10] p-4">
-              <div className="mb-3 flex items-center justify-between"><h3 className="font-bold text-white">{bank.title}</h3><span className="text-xs text-slate-500">{bank.items.length} itens</span></div>
-              {bank.items.length === 0 ? <p className="py-8 text-center text-xs text-slate-500">{bank.empty}</p> : (
-                <div className="grid grid-cols-4 gap-2 sm:grid-cols-6">
-                  {bank.items.map((item: any) => (
-                    <div key={`${bank.title}-${item.slot}-${item.virtualItemId || ''}`} title={`${item.name} · Durabilidade ${item.durability}`} className="group relative flex aspect-square items-center justify-center rounded border border-[#343a48] bg-[url('/images/mu-inventory-box.jpg')] bg-cover p-1 hover:border-amber-400">
-                      <img src={item.visualPath} alt={item.name} className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.9)]" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} />
-                      <span className="pointer-events-none absolute bottom-0 left-0 right-0 truncate bg-black/80 px-1 py-0.5 text-center text-[8px] text-white opacity-0 transition group-hover:opacity-100">{item.name}</span>
-                    </div>
-                  ))}
-                </div>
-              )}
+            <div key={bank.title} className="rounded-xl border border-amber-500/30 bg-[#21190d] p-3 shadow-xl">
+              <div className="mb-3 flex items-center justify-between rounded-lg border-b border-amber-500/20 px-2 pb-3"><h3 className="font-bold text-white">{bank.title}</h3><span className="rounded-full bg-black/40 px-2 py-1 text-xs text-amber-200">ZEN 0</span></div>
+              <div className="grid grid-cols-8 overflow-hidden rounded border border-[#4b3a1b] bg-[#080905]">
+                {Array.from({ length: 120 }, (_, slot) => {
+                  const item = bank.items.find((candidate: any) => candidate.slot === slot);
+                  return <div key={slot} className="group relative aspect-square border border-[#302817] bg-black/20 p-0.5 hover:bg-amber-400/10">
+                    {item && <div title={`${item.name} · Durabilidade ${item.durability}`} className="absolute inset-0 z-10 flex items-center justify-center"><img src={item.visualPath} alt={item.name} className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.95)]" onError={(event) => { event.currentTarget.style.visibility = 'hidden'; }} /><span className="pointer-events-none absolute bottom-0 left-0 right-0 truncate bg-black/90 px-1 py-0.5 text-center text-[8px] text-white opacity-0 transition group-hover:opacity-100">{item.name}</span></div>}
+                  </div>;
+                })}
+              </div>
             </div>
           ))}
         </div>
