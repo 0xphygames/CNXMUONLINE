@@ -150,7 +150,14 @@ export default function CharacterPage() {
 }
 
 function Shell({ children }: { children: React.ReactNode }) {
-  return <main className="min-h-screen bg-[#07090d] px-4 py-10 text-slate-100"><div className="mx-auto max-w-4xl">{children}</div></main>;
+  return (
+    <main
+      className="min-h-screen bg-[#07090d] bg-cover bg-fixed bg-center px-4 py-10 text-slate-100"
+      style={{ backgroundImage: "linear-gradient(rgba(7,9,13,.86), rgba(7,9,13,.96)), url('/images/mu_season6_classes_1791666426349.jpg')" }}
+    >
+      <div className="mx-auto max-w-4xl">{children}</div>
+    </main>
+  );
 }
 
 function Stat({ label, value }: { label: string; value: React.ReactNode }) {
