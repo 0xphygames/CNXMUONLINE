@@ -16,7 +16,17 @@ type CharData = {
   attributes?: { strength: number; agility: number; vitality: number; energy: number; command: number };
   map?: number;
   online?: boolean;
-  equipment?: { slot: number; slotName: string; name: string; category: string; durability: number }[];
+  equipment?: {
+    slot: number;
+    slotName: string;
+    group: number;
+    index: number;
+    name: string;
+    category: string;
+    durability: number;
+    visualKey: string;
+    visualPath: string;
+  }[];
 };
 
 type State =
@@ -180,11 +190,20 @@ function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[nu
   return (
     <div
       title={`${item.slotName}: ${item.name} · Durabilidade ${item.durability}`}
-      className="absolute z-10 overflow-hidden rounded border border-amber-300/70 bg-slate-950/85 px-1 py-1 text-center shadow-lg shadow-black/60"
+      className="absolute z-10 overflow-hidden rounded border border-amber-300/70 bg-slate-950/70 text-center shadow-lg shadow-black/60"
       style={{ left: marker.left, top: marker.top, width: marker.width }}
     >
-      <p className="truncate text-[9px] font-semibold leading-tight text-amber-100">{item.name}</p>
-      <p className="text-[8px] leading-tight text-slate-300">Dur. {item.durability}</p>
+      <img
+        src={item.visualPath}
+        alt={item.name}
+        className="mx-auto hidden h-full max-h-20 min-h-8 w-full object-contain"
+        onLoad={(event) => event.currentTarget.classList.remove('hidden')}
+        onError={(event) => event.currentTarget.remove()}
+      />
+      <div className="px-1 py-1">
+        <p className="truncate text-[9px] font-semibold leading-tight text-amber-100">{item.name}</p>
+        <p className="text-[8px] leading-tight text-slate-300">Dur. {item.durability}</p>
+      </div>
     </div>
   );
 }
