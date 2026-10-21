@@ -1,11 +1,19 @@
 
 import { NextRequest, NextResponse } from 'next/server';
 import { MuDatabase } from '@/lib/db';
+import { decodeStorageItems } from '@/lib/char-equipment';
 
 export async function GET(req: NextRequest) {
   const account = req.cookies.get('mu_session_user')?.value;
   if (!account) return NextResponse.json({ success: false, message: 'Faça login.' }, { status: 401 });
-  return NextResponse.json({ success: true, items: await MuDatabase.getVirtualBankItems(account.trim().toLowerCase()) });
+  const username = account.trim().toLowerCase();
+  const [warehouse, virtual] = await Promise.all([
+    MuDatabase.getGameWarehouse(username),
+    MuDatabase.getVirtualBankItems(username),
+  ]);
+  const gameItems = warehouse ? decodeStorageItems(new Uint8Array(warehouse), 'warehouse') : [];
+  const virtualItems = virtual.flatMap((item) => decodeStorageItems(new Uint8Array(item.ItemData), 'virtual', Number(item.VirtualItemID)));
+  return NextResponse.json({ success: true, warehouse: gameItems, virtual: virtualItems });
 }
 
 export async function POST(req: NextRequest) {
