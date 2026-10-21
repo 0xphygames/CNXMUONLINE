@@ -173,37 +173,33 @@ export default function CharacterPage() {
   );
 }
 
-const EQUIPMENT_MARKERS: Record<number, { left: string; top: string; width: string }> = {
-  0: { left: '9%', top: '31%', width: '24%' },
-  1: { left: '67%', top: '31%', width: '24%' },
-  2: { left: '41%', top: '26%', width: '18%' },
-  3: { left: '41%', top: '43%', width: '18%' },
-  4: { left: '41%', top: '61%', width: '18%' },
-  5: { left: '10%', top: '61%', width: '24%' },
-  6: { left: '67%', top: '61%', width: '24%' },
-  8: { left: '72%', top: '12%', width: '18%' },
-  10: { left: '9%', top: '48%', width: '18%' },
+const EQUIPMENT_MARKERS: Record<number, { left: string; top: string; width: string; height: string }> = {
+  0: { left: '8%', top: '29%', width: '26%', height: '30%' },
+  1: { left: '66%', top: '29%', width: '26%', height: '30%' },
+  2: { left: '39%', top: '19%', width: '22%', height: '17%' },
+  3: { left: '39%', top: '39%', width: '22%', height: '23%' },
+  4: { left: '39%', top: '60%', width: '22%', height: '23%' },
+  5: { left: '8%', top: '59%', width: '26%', height: '24%' },
+  6: { left: '66%', top: '59%', width: '26%', height: '24%' },
+  8: { left: '66%', top: '8%', width: '26%', height: '22%' },
+  10: { left: '8%', top: '45%', width: '22%', height: '16%' },
 };
 
 function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[number] }) {
-  const marker = EQUIPMENT_MARKERS[item.slot] ?? { left: '38%', top: '80%', width: '24%' };
+  const marker = EQUIPMENT_MARKERS[item.slot] ?? { left: '38%', top: '80%', width: '24%', height: '18%' };
   return (
     <div
       title={`${item.slotName}: ${item.name} · Durabilidade ${item.durability}`}
-      className="absolute z-10 overflow-hidden rounded border border-amber-300/70 bg-slate-950/70 text-center shadow-lg shadow-black/60"
-      style={{ left: marker.left, top: marker.top, width: marker.width }}
+      aria-label={`${item.slotName}: ${item.name}`}
+      className="absolute z-10 flex items-center justify-center overflow-hidden"
+      style={{ left: marker.left, top: marker.top, width: marker.width, height: marker.height }}
     >
       <img
         src={item.visualPath}
         alt={item.name}
-        className="mx-auto hidden h-full max-h-20 min-h-8 w-full object-contain"
-        onLoad={(event) => event.currentTarget.classList.remove('hidden')}
+        className="h-full w-full object-contain drop-shadow-[0_2px_3px_rgba(0,0,0,.9)]"
         onError={(event) => event.currentTarget.remove()}
       />
-      <div className="px-1 py-1">
-        <p className="truncate text-[9px] font-semibold leading-tight text-amber-100">{item.name}</p>
-        <p className="text-[8px] leading-tight text-slate-300">Dur. {item.durability}</p>
-      </div>
     </div>
   );
 }
