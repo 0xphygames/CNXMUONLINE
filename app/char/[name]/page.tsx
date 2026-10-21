@@ -128,17 +128,31 @@ export default function CharacterPage() {
           <div className="relative">
             <h2 className="text-lg font-semibold text-white mb-4">Equipamentos</h2>
             {c.equipment && c.equipment.length > 0 ? (
-              <ul className="grid gap-3 md:grid-cols-2">
-                {c.equipment.map((item) => (
-                  <li key={item.slot} className="rounded-lg border border-white/10 bg-black/40 p-3 backdrop-blur-sm">
-                    <p className="text-xs text-slate-400">{item.slotName}</p>
-                    <p className="font-semibold text-white">{item.name}</p>
-                    <p className="text-xs text-slate-400">
-                      {item.category} · Durabilidade {item.durability}
-                    </p>
-                  </li>
-                ))}
-              </ul>
+              <>
+                <div className="mx-auto w-full max-w-[375px] rounded-lg border border-white/10 bg-black/50 p-2 shadow-2xl">
+                  <div className="relative aspect-[375/425] overflow-hidden rounded-md bg-black">
+                    <img
+                      src="/images/mu-equipment-layout.png"
+                      alt="Layout original dos equipamentos do personagem"
+                      className="absolute inset-0 h-full w-full object-cover"
+                    />
+                    {c.equipment.map((item) => (
+                      <EquipmentMarker key={item.slot} item={item} />
+                    ))}
+                  </div>
+                </div>
+                <ul className="mx-auto mt-4 grid max-w-2xl gap-3 md:grid-cols-2">
+                  {c.equipment.map((item) => (
+                    <li key={item.slot} className="rounded-lg border border-white/10 bg-black/40 p-3 backdrop-blur-sm">
+                      <p className="text-xs text-slate-400">{item.slotName}</p>
+                      <p className="font-semibold text-white">{item.name}</p>
+                      <p className="text-xs text-slate-400">
+                        {item.category} · Durabilidade {item.durability}
+                      </p>
+                    </li>
+                  ))}
+                </ul>
+              </>
             ) : (
               <p className="text-slate-400">Nenhum equipamento visível.</p>
             )}
@@ -146,6 +160,32 @@ export default function CharacterPage() {
         </section>
       )}
     </Shell>
+  );
+}
+
+const EQUIPMENT_MARKERS: Record<number, { left: string; top: string; width: string }> = {
+  0: { left: '9%', top: '31%', width: '24%' },
+  1: { left: '67%', top: '31%', width: '24%' },
+  2: { left: '41%', top: '26%', width: '18%' },
+  3: { left: '41%', top: '43%', width: '18%' },
+  4: { left: '41%', top: '61%', width: '18%' },
+  5: { left: '10%', top: '61%', width: '24%' },
+  6: { left: '67%', top: '61%', width: '24%' },
+  8: { left: '72%', top: '12%', width: '18%' },
+  10: { left: '9%', top: '48%', width: '18%' },
+};
+
+function EquipmentMarker({ item }: { item: NonNullable<CharData['equipment']>[number] }) {
+  const marker = EQUIPMENT_MARKERS[item.slot] ?? { left: '38%', top: '80%', width: '24%' };
+  return (
+    <div
+      title={`${item.slotName}: ${item.name} · Durabilidade ${item.durability}`}
+      className="absolute z-10 overflow-hidden rounded border border-amber-300/70 bg-slate-950/85 px-1 py-1 text-center shadow-lg shadow-black/60"
+      style={{ left: marker.left, top: marker.top, width: marker.width }}
+    >
+      <p className="truncate text-[9px] font-semibold leading-tight text-amber-100">{item.name}</p>
+      <p className="text-[8px] leading-tight text-slate-300">Dur. {item.durability}</p>
+    </div>
   );
 }
 
