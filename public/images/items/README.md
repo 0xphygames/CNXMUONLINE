@@ -1,10 +1,12 @@
 # Itens visuais do MU
 
-Os arquivos publicados nesta pasta usam a chave `grupo_indice.webp`, por
-exemplo `0_31.webp`. A API de personagem devolve essa mesma chave em
-`visualKey` e o caminho público em `visualPath`.
+Os arquivos publicados nesta pasta usam o padrão de ícones do OpenMU:
+`item_grupo_indice_nivel.png`, por exemplo `item_0_31_0.png`. A API de
+personagem devolve a chave `grupo_indice` e o caminho público em `visualPath`.
 
-O pipeline `scripts/convert-mu-item-assets.mjs` usa os arquivos originais do cliente.
+O pipeline `scripts/convert-mu-item-assets.mjs` permanece disponível para
+clientes que não possuam os ícones do OpenMU. Para este site, os ícones
+pré-renderizados do OpenMU são preferidos.
 Ele reproduz o fluxo do MuTexConv open source, removendo o cabeçalho de 24 bytes
 do OZJ e de 4 bytes do OZT antes de gerar o WebP:
 
@@ -20,8 +22,5 @@ $env:SHARP_MODULE = (Resolve-Path '.tmp-image-tools/node_modules/sharp').Path
 node scripts/convert-mu-item-assets.mjs 'D:\IA\MU ONLINE\cliente instaler\CLIENTE NOVO\Data' public/images/items
 ```
 
-O script gera a textura WebP correspondente à chave do item. Para renderizar
-o modelo 3D completo do BMD como ícone, é necessário executar o renderizador
-Three.js/Electron do cliente com câmera ortográfica e exportar o frame. Não
-coloque os binários proprietários do cliente no repositório. Publique
-somente os renders 2D `.webp` aprovados para exibição no site.
+Os ícones PNG são assets derivados já renderizados pelo OpenMU e não exigem
+os binários proprietários do cliente no repositório.
