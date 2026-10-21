@@ -16,6 +16,10 @@ export default function Navbar() {
   const [visitorsOnline, setVisitorsOnline] = useState<number | null>(null);
 
   useEffect(() => {
+    const presenceIdKey = 'site-presence-id';
+    const presenceId = sessionStorage.getItem(presenceIdKey) || crypto.randomUUID();
+    sessionStorage.setItem(presenceIdKey, presenceId);
+
     const loadStatus = () => fetch('/api/status', { cache: 'no-store' })
       .then((res) => res.json())
       .then((data) => {
@@ -31,7 +35,10 @@ export default function Navbar() {
 
     loadStatus();
     const interval = window.setInterval(loadStatus, 30_000);
-    const presence = () => fetch('/api/presence', { cache: 'no-store' })
+    const presence = () => fetch('/api/presence', {
+      cache: 'no-store',
+      headers: { 'x-site-presence-id': presenceId },
+    })
       .then((res) => res.json())
       .then((data) => setVisitorsOnline(data.success ? Number(data.visitorsOnline ?? 0) : null))
       .catch(() => setVisitorsOnline(null));
