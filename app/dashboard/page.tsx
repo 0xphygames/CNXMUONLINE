@@ -236,12 +236,37 @@ export default function DashboardPage() {
         </div>
       </div>
 
-      <section className="rounded-xl border border-amber-500/30 bg-[#12151c] p-6">
-        <div className="flex items-center justify-between border-b border-[#222733] pb-4">
-          <div><h2 className="text-xl font-bold text-white">Baú virtual</h2><p className="mt-1 text-xs text-slate-400">Itens comprados no site. Clique para confirmar o envio ao CashShop do jogo.</p></div>
+      <section className="overflow-hidden rounded-xl border border-amber-500/30 bg-[#12151c]">
+        <div className="flex items-center justify-between border-b border-[#222733] px-6 py-5">
+          <div>
+            <h2 className="text-xl font-bold text-white">Baú virtual</h2>
+            <p className="mt-1 text-xs text-slate-400">Itens comprados no site. Selecione um slot para enviar ao CashShop do jogo.</p>
+          </div>
           <Link href="/shop" className="rounded-lg bg-amber-400 px-4 py-2 text-xs font-bold text-black">Comprar itens</Link>
         </div>
-        {chest.length === 0 ? <p className="py-6 text-sm text-slate-500">Seu baú está vazio.</p> : <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">{chest.map((item) => <div key={item.DeliveryID} className="rounded-lg border border-[#343a48] bg-[#0b0d11] p-4"><strong className="text-white">{item.Name}</strong><p className="mt-1 text-[11px] text-slate-400">Entrega #{item.DeliveryID}</p><button disabled={!!item.ClaimedAt || transferLoading === item.DeliveryID} onClick={() => transferItem(item.DeliveryID)} className="mt-4 w-full rounded-lg bg-emerald-500 px-3 py-2 text-xs font-bold text-black disabled:opacity-50">{item.ClaimedAt ? 'Enviado para o jogo' : transferLoading === item.DeliveryID ? 'Enviando...' : 'Enviar para o jogo'}</button></div>)}</div>}
+        {chest.length === 0 ? (
+          <p className="px-6 py-8 text-sm text-slate-500">Seu baú está vazio.</p>
+        ) : (
+          <div className="bg-[radial-gradient(circle_at_top,rgba(245,158,11,.12),transparent_55%),#090b10] p-5 sm:p-6">
+            <div className="grid grid-cols-2 gap-2 sm:grid-cols-4 lg:grid-cols-6">
+              {chest.map((item) => {
+                const claimed = Boolean(item.ClaimedAt);
+                return (
+                  <div key={item.DeliveryID} className="group relative min-h-44 rounded-lg border border-[#343a48] bg-black/45 p-3 shadow-inner transition hover:border-amber-400/70">
+                    <div className="flex h-20 items-center justify-center rounded border border-white/10 bg-[#151923] text-4xl" aria-hidden="true">
+                      {item.CategorySlug === 'pet' ? '🐼' : item.CategorySlug === 'equipment' ? '⚔️' : '📦'}
+                    </div>
+                    <p className="mt-2 line-clamp-2 text-xs font-semibold text-white" title={item.Name}>{item.Name}</p>
+                    <p className="mt-1 text-[10px] text-slate-500">Entrega #{item.DeliveryID}</p>
+                    <button disabled={claimed || transferLoading === item.DeliveryID} onClick={() => transferItem(item.DeliveryID)} className={`mt-3 w-full rounded px-2 py-1.5 text-[10px] font-bold ${claimed ? 'bg-slate-700 text-slate-300' : 'bg-emerald-500 text-black'} disabled:cursor-not-allowed disabled:opacity-60`}>
+                      {claimed ? 'Enviado' : transferLoading === item.DeliveryID ? 'Enviando...' : 'Enviar ao jogo'}
+                    </button>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        )}
       </section>
 
       {/* Characters & Management Grid */}
