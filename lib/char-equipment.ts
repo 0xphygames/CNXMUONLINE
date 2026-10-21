@@ -46,7 +46,23 @@ export type EquippedItem = {
   name: string;
   category: string;
   durability: number;
+  visualKey: string;
+  visualPath: string;
 };
+
+/**
+ * Assets publicados seguem a chave do cliente MU: grupo + índice do item.
+ * O arquivo é gerado a partir dos BMD/OZJ/OZT do cliente e fica em
+ * public/images/items. Quando ainda não existe, o frontend mantém o fallback
+ * textual sem quebrar a página pública.
+ */
+export function getItemVisual(group: number, itemIndex: number) {
+  const visualKey = `${group}_${itemIndex}`;
+  return {
+    visualKey,
+    visualPath: `/images/items/${visualKey}.webp`,
+  };
+}
 
 export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
   const result: EquippedItem[] = [];
@@ -61,6 +77,7 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
     const group = record[9] >> 4;
     const itemIndex = record[0];
     const entry = index.get(`${group}:${itemIndex}`);
+    const visual = getItemVisual(group, itemIndex);
 
     result.push({
       slot,
@@ -70,6 +87,7 @@ export function decodeEquipment(inventory: Uint8Array): EquippedItem[] {
       name: entry?.n ?? 'Item desconhecido',
       category: GROUP_CATEGORY[group] ?? (entry?.s === 8 ? 'Pet' : entry?.s === 10 ? 'Colar/Anel' : 'Outro'),
       durability: record[2],
+      ...visual,
     });
   }
 
