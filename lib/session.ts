@@ -26,6 +26,11 @@ export function createSessionToken(accountId: string): string | null {
   return `${payload}.${sign(payload, key)}`;
 }
 
+// Identidade da requisição: somente a sessão assinada. Cookies não assinados são ignorados.
+export function getSessionAccount(req: { cookies: { get(name: string): { value: string } | undefined } }): string | null {
+  return verifySessionToken(req.cookies.get(SESSION_COOKIE)?.value);
+}
+
 export function verifySessionToken(token: string | undefined): string | null {
   const key = secret();
   if (!key || !token) return null;

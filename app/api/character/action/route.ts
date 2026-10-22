@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MuDatabase } from '@/lib/db';
+import { getSessionAccount } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
   try {
-    const sessionCookie = req.cookies.get('mu_session_user')?.value;
+    // Identidade somente pela sessão assinada; nenhum username do corpo é aceito.
+    const targetUser = getSessionAccount(req);
     const body = await req.json();
-    const { action, characterName, username, newPassword } = body;
-
-    const targetUser = sessionCookie || username;
+    const { action, characterName, newPassword } = body;
 
     if (!targetUser) {
       return NextResponse.json(

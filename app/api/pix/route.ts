@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from 'next/server';
 import { createPixPayment } from '@/lib/mercadopago';
 import { MuDatabase } from '@/lib/db';
 import { WCOIN_PACKAGES } from '@/lib/mu-constants';
+import { getSessionAccount } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
   try {
-    const sessionCookie = req.cookies.get('mu_session_user')?.value;
+    // Identidade somente pela sessão assinada; nenhum username do corpo é aceito.
+    const targetAccount = getSessionAccount(req);
     const body = await req.json();
-    const { packageId, customAmount, username, email } = body;
-
-    const targetAccount = sessionCookie || username;
+    const { packageId, customAmount, email } = body;
 
     if (!targetAccount) {
       return NextResponse.json(
