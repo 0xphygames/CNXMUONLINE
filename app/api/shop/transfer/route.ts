@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MuDatabase } from '@/lib/db';
+import { getSessionAccount } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
-  const account = req.cookies.get('mu_session_user')?.value;
+  const account = getSessionAccount(req);
   if (!account) return NextResponse.json({ success: false, message: 'Faça login.' }, { status: 401 });
   try {
     const { deliveryId } = await req.json();

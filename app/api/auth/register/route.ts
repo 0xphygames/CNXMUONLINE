@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { MuDatabase } from '@/lib/db';
+import { SESSION_COOKIE, createSessionToken } from '@/lib/session';
 
 export async function POST(req: NextRequest) {
   try {
@@ -79,7 +80,14 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    response.cookies.set('mu_session_user', cleanUser, {
+    const signed = createSessionToken(cleanUser);
+    if (!signed) {
+      return NextResponse.json(
+        { success: false, message: 'Sessão indisponível: SESSION_SECRET não configurado.' },
+        { status: 500 }
+      );
+    }
+    response.cookies.set(SESSION_COOKIE, signed, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',

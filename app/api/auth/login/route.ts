@@ -59,26 +59,21 @@ export async function POST(req: NextRequest) {
       },
     });
 
-    // Set lightweight session cookie for state persistence
-    response.cookies.set('mu_session_user', account.memb___id, {
+    // Sessão assinada: única fonte de identidade do site.
+    const signed = createSessionToken(account.memb___id);
+    if (!signed) {
+      return NextResponse.json(
+        { success: false, message: 'Sessão indisponível: SESSION_SECRET não configurado.' },
+        { status: 500 }
+      );
+    }
+    response.cookies.set(SESSION_COOKIE, signed, {
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',
       sameSite: 'lax',
       path: '/',
-      maxAge: 60 * 60 * 24 * 7, // 7 days
+      maxAge: 60 * 60 * 24 * 7,
     });
-
-    // Sessão assinada, usada por ações sensíveis (ex.: ocultação VIP).
-    const signed = createSessionToken(account.memb___id);
-    if (signed) {
-      response.cookies.set(SESSION_COOKIE, signed, {
-        httpOnly: true,
-        secure: process.env.NODE_ENV === 'production',
-        sameSite: 'lax',
-        path: '/',
-        maxAge: 60 * 60 * 24 * 7,
-      });
-    }
 
     return response;
   } catch (error) {

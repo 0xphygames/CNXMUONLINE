@@ -103,20 +103,6 @@ export default function DonatePage() {
     setPollingInterval(interval);
   };
 
-  const handleSimulatePaymentApproval = async () => {
-    if (!pixData?.paymentId) return;
-    try {
-      const res = await fetch(`/api/pix/status?id=${pixData.paymentId}&simulate=true`);
-      const data = await res.json();
-      if (data.success) {
-        setPaymentApproved(true);
-        if (pollingInterval) clearInterval(pollingInterval);
-        if (refreshUser) refreshUser();
-      }
-    } catch (err) {
-      alert((err as Error).message);
-    }
-  };
 
   const handleCopyPixCode = () => {
     if (!pixData?.qrCode) return;
@@ -471,16 +457,6 @@ export default function DonatePage() {
                     <span className="text-amber-400 font-semibold tabular-nums">Verificando</span>
                   </div>
 
-                  {/* Sandbox instant simulation button for evaluator/demo testing */}
-                  <div className="pt-2 border-t border-[#181d26] flex items-center justify-between">
-                    <span className="text-[11px] text-slate-400">Modo de Teste / Sandbox:</span>
-                    <button
-                      onClick={handleSimulatePaymentApproval}
-                      className="px-3 py-1.5 bg-emerald-500/20 hover:bg-emerald-500/30 border border-emerald-500/40 text-emerald-300 text-xs font-semibold rounded transition-colors"
-                    >
-                      Simular Aprovação Pix (Webhook)
-                    </button>
-                  </div>
                 </div>
 
                 <div className="text-[11px] text-slate-400 text-center">
